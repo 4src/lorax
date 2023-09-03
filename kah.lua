@@ -1,4 +1,6 @@
-lint=require"lint"
+local lint=require"lint"
+local klass=require"klass"
+local 
 local the = {
 	act      = "nothing",
 	decimals = 2, 
