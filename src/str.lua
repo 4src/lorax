@@ -1,6 +1,7 @@
 local klass=require"klass"
 local stat=require"stat"
 local list=require"list"
+local fmt=string.format
 
 local str={}
 
@@ -12,7 +13,7 @@ function str.o(x,    t)
   t={}; for k,v in pairs(x) do 
           if not (tostring(k)):sub(1,1) ~= "_" then 
             t[1+#t] = #x>0 and str.o(v) or fmt(":%s %s",k,str.o(v)) end end 
-  return str.o(x._is or "").."("..table.concat(#x>0 and t or list.sort(t)," ")..")" end
+  return str.o(x._is or "").."{"..table.concat(#x>0 and t or list.sort(t)," ").."}" end
   
 function str.oo(x) print(str.o(x)); return x end
 
