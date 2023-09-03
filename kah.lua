@@ -1,6 +1,7 @@
 local lint=require"lint"
 local klass=require"klass"
-local 
+local obj=klass.obj
+
 local the = {
 	act      = "nothing",
 	decimals = 2, 
@@ -9,16 +10,8 @@ local the = {
 	p        = 2,
 	seed     = 937162211
 }
------------------------------------------------------------------------
-local objects={}
-local function obj(s) local x={}; objects[s]=x; return x end
-local Data,Num,Row,Sym = obj"Data", obj"Num",  obj"Row", obj"Sym"
 
-local function like(i,...) return i._is.like(i,...) end
-local function dist(i,...) return i._is.dist(i,...) end
-local function add(i,x)    return i._is.add(i,x) end
-local function div(i)      return i._is.div(i) end
-local function mid(i)      return i._is.mid(i) end
+local Data,Num,Row,Sym = obj"Data", obj"Num",  obj"Row", obj"Sym"
 -----------------------------------------------------------------------
 local big = 1E30
 local fmt = string.format
@@ -74,37 +67,7 @@ function str.csv(sFilename,fun,      src,s,cells)
   while true do
     s = io.read(); if s then fun(_cells(s,{})) else return io.close(src) end end end
  -----------------------------------------------------------------------
-local egs={order={}, index={}}
-function eg(s,fun)
-  tag,doc = s:match"([^:]+):(.*)"
-  egs.index[tag] = push(egs.order, {tag=tag,doc=doc,fun=fun}) end
 
-eg("all:run all examples",function()  
- for _,x in pairs(egs.order) do egs.run(x.fun,x.tag) end)
-
-function egs.run(fun,name,    ok,b4,result,out)
-  b4={}; for k,v in pairs(the) b4[k]=v end
-  math.randomseed(the.seed)
-  rand.seed  = the.seed
-  ok, result = pcall(fun)
-  out        = ok and result or false
-  if not ok then print("❌ FAIL ",result) end
-  for k,v in pairs(b4) do the[k]=v end
-  return out end
-
-function egs.runs()
-  the = run.cli(the)
-  todo = egs.index[the.act]
-  if todo then egs.run(todo.fun, todo.tag) end end
-
-function egs.cli(t)
-  for k,v in pairs(t) do
-    v = tostring(v)
-    for n,x in ipairs(arg) do
-      if x=="-"..(k:sub(1,1)) or x=="--"..k then
-        v = v=="false" and "true" or v=="true" and "false" or arg[n+1] end end
-    t[k] = str.coerce(v) end
-  return t end
 
 local o, oo, push, sort = str.o, str.oo, list.push, list.sort
 -----------------------------------------------------------------------

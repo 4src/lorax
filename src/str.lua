@@ -1,4 +1,6 @@
 local klass=require"klass"
+local stat=require"stat"
+local list=require"list"
 
 local str={}
 
@@ -8,7 +10,7 @@ function str.o(x,    t)
   if klass.names[x]        then return klass.names[x] end
   if type(x) ~= "table"    then return tostring(x) end
   t={}; for k,v in pairs(x) do 
-          if not (str(k)):sub(1,1) ~= "_" then 
+          if not (tostring(k)):sub(1,1) ~= "_" then 
             t[1+#t] = #x>0 and str.o(v) or fmt(":%s %s",k,str.o(v)) end end 
   return str.o(x._is or "").."("..table.concat(#x>0 and t or list.sort(t)," ")..")" end
   
