@@ -15,7 +15,7 @@ OPTIONS:
 ]]
 
 help:gsub("\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)",
-  the[k] = math.tointeger(v) or tonumber(v) or v=="true" or v ~= "false" and v or false) 
+  the[k] = math.tointeger(v) or tonumber(v) or v=="true" or (v ~= "false" and v) or false
 
 the._help=help
 

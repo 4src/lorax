@@ -18,7 +18,7 @@ function str.oo(x) print(str.o(x)); return x end
 
 function str.coerce(s)
   s = s:match"^%s*(.-)%s*$"
-  return math.tointeger(s) or tonumber(s) or s=="true" or s ~= "false" and s or false end
+  return math.tointeger(s) or tonumber(s) or s=="true" or (s ~= "false" and s) or false end
 
 function str.csv(sFilename,fun,      src,s,cells)
   function _cells(s,t)
