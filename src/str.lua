@@ -1,3 +1,4 @@
+local egs=require"egs"
 local klass=require"klass"
 local stat=require"stat"
 local list=require"list"

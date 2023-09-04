@@ -1,4 +1,7 @@
-stat=require"stat"
+local stat=require"stat"
+local obj=require("klass").obj
+
+local Sym=obj"Sym"
 
 function Sym.init(at,txt)
   return {_is=Sym, n=0, at=at or 0, txt=txt or "",has ={}, most=0, mode=None} end

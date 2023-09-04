@@ -1,7 +1,7 @@
-local kl=require"klass"
+local obj=require("klass").obj
 local exp,big = math.exp, math.big
 
-Num=kl"Num"
+local Num=obj"Num"
 
 function Num.init(at,txt)
   return {_is=Num, n=0, at=at or 0, txt=txt or "",
