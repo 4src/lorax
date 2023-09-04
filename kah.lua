@@ -1,75 +1,32 @@
+#!/usr/bin/env lua
 local lint=require"lint"
+
+local help=[[
+KAH : the knowledge acquition helper
+(c) 2023 Tim Menzies <timm@ieee.org> BSD-2
+
+USAGE
+  lua kah.lua [OPTIONS] 
+
+OPTIONS:
+	-a  --act      start up action      = nothing
+	-d  --decimals placed for float     = 2 
+	-k  --k        NB low frequency     = 2 
+	-m  --m        NB low frequency     = 1 
+	-p  --p        distance coeffecient = 2
+	-s  --seed     random number seed   = 937162211
+]]
 local klass=require"klass"
-local obj=klass.obj
+local str=require"str"
+local list=require"list"
+local egs=require"egs"
 
-local the = {
-	act      = "nothing",
-	decimals = 2, 
-	k        = 2, 
-	m        = 1, 
-	p        = 2,
-	seed     = 937162211
-}
-
-local Data,Num,Row,Sym = obj"Data", obj"Num",  obj"Row", obj"Sym"
------------------------------------------------------------------------
+local is, o, oo, push, sort = klass.obj, str.o, str.oo, list.push, list.sort
 local big = 1E30
 local fmt = string.format
 local max,min,log,exp,pi = math.max,math.min,math.log,math.exp,math.pi
 -----------------------------------------------------------------------
-local stat={}
-function stat.entropy(t,    e,n) 
-  e,n = 0,0
-  for _,m in pairs(t) do n = n + m end
-  for _,m in pairs(t) do e = e - (m/n * log(m/n,2) end
-  return e end
-
-function stat.rnd(n,  nPlaces,     mult)
-  mult = 10^(nPlaces or the.decimals)
-  return math.floor(n * mult + 0.5) / mult end
------------------------------------------------------------------------  
-local list={}
-function list.sort(t,fun) table.sort(t,fun); return t end
-function list.push(t,x)   t[1+#t] = x; return x end
------------------------------------------------------------------------  
-local rand={}
-rand.seed = 937162211
-
-function rand.rint(nlo,nhi) return floor(0.5 + rand.rand(nlo,nhi)) end
-
-function rand.rand(nlo,nhi)
-  nlo,nhi=nlo or 0, nhi or 1
-  rand.seed = (16807 * rand.seed) % 2147483647
-  return nlo + (nhi-nlo) * rand.seed / 2147483647 end
------------------------------------------------------------------------
-local str={}
-function str.o(x,    t)
-  if type(x) == "function" then return "f()" end
-  if type(x) == "number"   then return tostring(stat.rnd(x)) end
-  if objects[x]            then return objects[x] end
-  if type(x) ~= "table"    then return tostring(x) end
-  t={}; for k,v in pairs(x) do 
-          if not (str(k)):sub(1,1) ~= "_" then 
-            t[1+#t] = #x>0 and str.o(v) or fmt(":%s %s",k,str.o(v)) end end
-  return (str.o(x._is or "").."("..table.concat(#x>0 and t or list.sort(t)," ")..")" end
-  
-function str.oo(x) print(str.o(x)); return x end
-
-function str.coerce(s,    _fun)
-  function _fun(s1)
-    return s1=="true" and true or (s1 ~= "false" and s1) or false end
-  return math.tointeger(s) or tonumber(s) or _fun(s:match"^%s*(.-)%s*$") end
-
-function str.csv(sFilename,fun,      src,s,cells)
-  function _cells(s,t)
-    for s1 in s:gmatch("([^,]+)") do t[1+#t]=str.coerce(s1) end; return t end
-  src = io.input(sFilename)
-  while true do
-    s = io.read(); if s then fun(_cells(s,{})) else return io.close(src) end end end
- -----------------------------------------------------------------------
-
-
-local o, oo, push, sort = str.o, str.oo, list.push, list.sort
+local Data,Num,Row,Sym = is"Data", is"Num",  is"Row", is"Sym"
 -----------------------------------------------------------------------
 function Num.new(at,txt)
   return {_is=Num, n=0, at=at or 0, txt=txt or "",
