@@ -17,15 +17,17 @@ function egs.Run(name,fun,    ok,b4,result,out)
   for k,v in pairs(b4) do the[k]=v end
   return out end
 
-function egs.Go()
+function egs.Go(    t)
   egs.Cli(the)
   if the.help then
     print(the._help or "")
     for name,_ in pairs(egs) do
       tag,help= name:match("(%w+)_(.+)")
-      print(string.format("  %-8s  %s",tag, (help:gsub("_"," ")))) end
+      print(string.format("  %-8s  %s",tag,help:gsub("_"," "))) end
   else
-   return egs.Runs() end end
+    t={}; for name,_ in pairs(egs) do t[1+#t] = name  end
+    for _,name in  sort(t) do
+      if name:find("^"..the.act) then egs.Run(name,egs[name]) end end end end
 
 function egs.Cli(t)
   for k,v in pairs(t) do

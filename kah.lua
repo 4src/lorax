@@ -83,7 +83,7 @@ function Row.classify(i, datas)
   for _,data in pairs(datas) do 
     tmp = like(data, i, ndata, nrows) 
     if tmp > max then max,out = tmp,data end end
-  return out,max end
+  return out,max end 
 -----------------------------------------------------------------------
 function Data.new(src,inits,      i)
   i = {_is=Data, rows={}}
