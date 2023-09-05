@@ -3,7 +3,7 @@ local exp,inf = math.exp, math.huge
 
 local Num=obj"Num"
 
-function Num.init(at,txt)
+function Num:init(at,txt)
   return {_is=Num, n=0, at=at or 0, txt=txt or "",
           mu=0, m2=0, sd=0, lo=inf, hi=-inf,
           heaven=(txt or ""):find"-$" and 0 or 1} end
