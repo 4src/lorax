@@ -10,7 +10,7 @@ function Sym.add(i,s,     d)
   if s ~= "?" then
     i.n = i.n + 1
     i.has[s] = (i.has[s] or 0) + 1
-    if i.has[s] > i.most: i.most, i.mode = i.has[s],s end end end 
+    if i.has[s] > i.most then i.most, i.mode = i.has[s],s end end end 
     
 function Sym.mid(i)          return i.mode end
 function Sym.div(i)          return stat.entropy(i.has) end

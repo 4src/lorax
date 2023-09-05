@@ -14,8 +14,8 @@ OPTIONS:
 	-s  --seed     random number seed   = 937162211
 ]]
 
-help:gsub("\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)",
-  the[k] = math.tointeger(v) or tonumber(v) or v=="true" or (v ~= "false" and v) or false
+help:gsub("\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)",function(k,v)
+  the[k] = math.tointeger(v) or tonumber(v) or v=="true" or (v ~= "false" and v) or false end)
 
 the._help=help
 
