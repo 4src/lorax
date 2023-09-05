@@ -1,4 +1,4 @@
-local obj=require("klass").obj
+local obj=require"obj"
 local exp,inf = math.exp, math.huge 
 
 local Num=obj"Num"
@@ -8,18 +8,18 @@ function Num:init(at,txt)
           mu=0, m2=0, sd=0, lo=inf, hi=-inf,
           heaven=(txt or ""):find"-$" and 0 or 1} end
 
-function Num.add(i,n,     d)
+function Num:add(self,n,     d)
   if n ~= "?" then
-    i.n  = i.n + 1
-    d    = n - i.mu
-    i.mu = i.mu + d/i.n
-    i.m2 = i.m2 + d*(x - i.mu)
-    i.lo = min(x, i.lo)
-    i.hi = max(x, i.hi) 
-    if i.n > 1 then i.sd = (i.m2/(i.n - 1))^.5 end end end 
+    self.n  = self.n + 1
+    d    = n - self.mu
+    self.mu = self.mu + d/self.n
+    self.m2 = self.m2 + d*(x - self.mu)
+    self.lo = min(x, self.lo)
+    self.hi = max(x, self.hi) 
+    self self.n > 1 then self.sd = (self.m2/(self.n - 1))^.5 end end end 
 
-function Num.mid(i)      return i.mu end
-function Num.div(i)      return i.sd end
-function Num.like(i,x,_) return exp(-.5*((x - i.mu)/i.sd)^2) / (i.sd*((2*pi)^0.5)) end 
+function Num:mid()     return self.mu end
+function Num:div()     return self.sd end
+function Num:like(x,_) return exp(-.5*((x - self.mu)/self.sd)^2) / (self.sd*((2*pi)^0.5)) end 
 
 return Num

@@ -1,5 +1,5 @@
 local egs = require"egs"
-local obj = require("klass").obj
+local obj = require"obj"
 
 local Row=obj"Row"
 
