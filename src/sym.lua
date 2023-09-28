@@ -3,17 +3,17 @@ local obj=require"obj"
 
 local Sym=obj"Sym"
 
-function Sym:init(at,txt)
+function Sym.init(i,at,txt)
   return {n=0, at=at or 0, txt=txt or "",has ={}, most=0, mode=None} end
 
-function Sym:add(s,     d)
+function Sym.add(i,s,     d)
   if s ~= "?" then
-    self.n = self.n + 1
-    self.has[s] = (self.has[s] or 0) + 1
-    if self.has[s] > self.most then self.most, self.mode = self.has[s],s end end end 
+    i.n = i.n + 1
+    i.has[s] = (i.has[s] or 0) + 1
+    if i.has[s] > i.most then i.most, i.mode = i.has[s],s end end end 
     
-function Sym:mid()         return self.mode end
-function Sym:div()         return stat.entropy(self.has) end
-function Sym:like(x,prior) return ((self.has[x] or 0) + the.m*prior)/(self.n+the.m) end
+function Sym.mid(i)          return i.mode end
+function Sym.div(i)          return stat.entropy(i.has) end
+function Sym.like(i,x,prior) return ((i.has[x] or 0) + the.m*prior)/(i.n+the.m) end
 
 return Sym

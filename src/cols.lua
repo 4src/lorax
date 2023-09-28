@@ -17,7 +17,7 @@ function Cols:init(t,    col,i,what,a)
   return i end
 
 function Cols.add(i,t)
-  for _,xy in pairs{i.x, i.y} do for _,col in pairs(xy) do col.add(t[c.at]) end end
+  for _,xy in pairs{i.x, i.y} do for _,col in pairs(xy) do col:add(t[c.at]) end end
   return row end
 
 return Cols
