@@ -18,7 +18,7 @@ OPTIONS:
   -s --seed   random number seed       = 937162211]]
 --------- --------- --------- --------- --------- --------- -----
 local kap,map,o,oo = lst.kap, lst.map, str.o,str.oo
-local obj,push     = l.obj,lst.push
+local obj,push,x     = l.obj,lst.pusha
 
 local NUM,SYM,ROW,DATA = obj"NUM", obj"SYM", obj"ROW", obj"DATA"
 --------- --------- --------- --------- --------- --------- -----
