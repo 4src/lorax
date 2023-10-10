@@ -1,11 +1,13 @@
 #!/usr/bin/env bash 
-for x in gawk lua5.3; do 
+for x in gawk lua5.3 ispell; do 
   command -v $x > /dev/null || sudo apt install $x; done
 
 _g() { _gp; }
 _h() { _help; }
 _l() { _lua $*; }
 _s() { _snips $*; }
+
+
 
 _help() {  ## _h          ;  show help
   echo ""
@@ -39,3 +41,7 @@ _snips() { ## _s file.md  ;  insert snips from code into markdown
   else 
     echo "missing $1.md or gawk"
   fi ; }
+
+_spell() { ## _spell file.md  ;  spell check file
+  ispell -x $1 ; }
+  

@@ -70,7 +70,7 @@ Please following the following code conventions.
 
 ```sh
 _g()  { _gp; } 
-_gp() {  ## _g          ;  commit all, push to github 
+_gp() {  ## _g          ;  commit all, push to GitHub 
    git commit -am saving; git push; git status; }
 ```
 
