@@ -1,4 +1,5 @@
 local l=require"lib"
+local egs=require"egs"
 local str,lst  = l.str,l.lst
 local the,help = str.settings[[
 
@@ -18,7 +19,7 @@ OPTIONS:
   -s --seed   random number seed       = 937162211]]
 --------- --------- --------- --------- --------- --------- -----
 local kap,map,o,oo = lst.kap, lst.map, str.o,str.oo
-local obj,push,x     = l.obj,lst.pusha
+local obj,push     = l.obj, lst.push
 
 local NUM,SYM,ROW,DATA = obj"NUM", obj"SYM", obj"ROW", obj"DATA"
 --------- --------- --------- --------- --------- --------- -----

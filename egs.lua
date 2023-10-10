@@ -1,1 +1,1 @@
--- egs
+return {}
