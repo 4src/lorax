@@ -3,13 +3,11 @@ local function rogues()
   for k,v in pairs(_ENV) do
     if not b4[k] then 
        print(str.fmt("#W ?%s %s",k,type(v)) ) end end end
-       
+
 --------- --------- --------- --------- --------- --------- -----
 local lst,str, mathx, sort, rand={},{},{},{},{}
 local kap,map,o,oo = lst.kap, lst.map, str.o,str.oo
 local push         = lst.push
---------- --------- --------- --------- --------- --------- -----
-
 --------- --------- --------- --------- --------- --------- -----
 local id=0
 local function obj(s,    t)
@@ -42,14 +40,14 @@ function lst.slice(t1, nGo, nStop, nInc,       t2)
 --------- --------- --------- --------- --------- --------- -----
 function sort.sorted(t,fun) table.sort(t,fun); return t end
 
-function sort.keysort(t,fun,      decorated,sorted,undecorated)
-  decorated   = map(t, function(z) return {x=z, y=fun(z)} end) 
-  sorted      = sort.sorted(decorated, sort.lt"y")
-  undecorated = map(t, function(z) return z.x  end)
-  return undecorated end
-
 function sort.lt(x) return function(t1,t2) return t1[x] < t2[x] end end
-function sort.gt(x) return function(t1,t2) return t1[x] > t2[x] end end       
+function sort.gt(x) return function(t1,t2) return t1[x] > t2[x] end end 
+
+function sort.keysort(t,fun,      decorated,sorted,undecorated)
+  decorated   = map(t, function(z) return {x=z, y=fun(z)} end)
+  sorted      = sort.sorted(decorated, sort.lt"y")
+  undecorated = map(sorted, function(z) return z.x  end)
+  return undecorated end
 --------- --------- --------- --------- --------- --------- -----
 function mathx.median(ns,p) return lst.per(ns, .5) end
 function mathx.stdev(ns,p) 
