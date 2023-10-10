@@ -7,8 +7,6 @@ _h() { _help; }
 _l() { _lua $*; }
 _s() { _snips $*; }
 
-
-
 _help() {  ## _h          ;  show help
   echo ""
   gawk 'BEGIN        {FS="[(][)][:space:]*[^#]+##[:space:]*"}
