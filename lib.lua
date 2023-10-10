@@ -5,9 +5,7 @@ local function rogues()
        print(str.fmt("#W ?%s %s",k,type(v)) ) end end end
 
 --------- --------- --------- --------- --------- --------- -----
-local lst,str, mathx, sort, rand={},{},{},{},{}
-local kap,map,o,oo = lst.kap, lst.map, str.o,str.oo
-local push         = lst.push
+local lst,str, mathx, sort, rand = {},{},{},{},{}
 --------- --------- --------- --------- --------- --------- -----
 local id=0
 local function obj(s,    t)
@@ -44,9 +42,9 @@ function sort.lt(x) return function(t1,t2) return t1[x] < t2[x] end end
 function sort.gt(x) return function(t1,t2) return t1[x] > t2[x] end end 
 
 function sort.keysort(t,fun,      decorated,sorted,undecorated)
-  decorated   = map(t, function(z) return {x=z, y=fun(z)} end)
+  decorated   = lst.map(t, function(z) return {x=z, y=fun(z)} end)
   sorted      = sort.sorted(decorated, sort.lt"y")
-  undecorated = map(sorted, function(z) return z.x  end)
+  undecorated = lst.map(sorted, function(z) return z.x  end)
   return undecorated end
 --------- --------- --------- --------- --------- --------- -----
 function mathx.median(ns,p) return lst.per(ns, .5) end
@@ -72,7 +70,8 @@ function rand.rand(nlo,nhi)
 function rand.any(t) return t[rand.rint(1,#t)] end
 
 function rand.many(t1,n,    t2)
-  t2={}; for _=1,n do push(t2, rand.any(t1)) end; return t2 end
+  t2={}; for _=1,n do lst.push(t2, rand.any(t1)) end
+  return t2 end
 --------- --------- --------- --------- --------- --------- -----
 str.fmt = string.format
 
@@ -80,18 +79,19 @@ function str.make(s)
   return math.tointeger(s) or tonumber(s) or (
          s=="true" or (s ~="false" and s)) end -- or false
 
-function str.settings(s,    t)
-  t={}
-  for k,v in s:gmatch(
-           "\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)") do
-    t[k]= str.make(v) end
-  return t,s end
+function str.settings(help,    settings)
+  settings={}
+  for k,s in help:gmatch(
+           "\n[%s]+.*[-][-]([%S]+)[^=]+=[%s]+([%S]+)") do
+           --"\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)") do
+    settings[k]= str.make(s) end
+  return settings,help end
 
-function str.oo(x) print(o(x)); return x end
+function str.oo(x) print(str.o(x)); return x end
 function str.o(t,     fun,tmp) 
   function fun (k,v) if not k:find"^_" then
-                  return string.format(":%s %s",k,o(v)) end end
-  tmp = #t>0 and map(t,o) or lst.sort(kap(t,fun))
+    return string.format(":%s %s",k,str.o(v)) end end
+  tmp = #t>0 and lst.map(t,str.o) or lst.sorted(lst.kap(t,fun))
   return (type(t) ~="table" and tostring(t) or (
           (t._name or "").."{"..table.concat(tmp," ").."}")) end
 --------- --------- --------- --------- --------- --------- -----

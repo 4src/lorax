@@ -2,6 +2,11 @@
 for x in gawk lua5.3 ispell; do 
   command -v $x > /dev/null || sudo apt install $x; done
 
+if [[ -z "$DASH" ]]; then
+  DASH="_"
+  PS1="$DASH$PS1";
+fi
+
 _g() { _gp; }
 _h() { _help; }
 _l() { _lua $*; }

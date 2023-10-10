@@ -25,18 +25,18 @@ local NUM,SYM,ROW,DATA = obj"NUM", obj"SYM", obj"ROW", obj"DATA"
 --------- --------- --------- --------- --------- --------- -----
 function COL(s) return  s:find("^[A-Z]") and NUM() or SYM() end
 
-function NUM:init() self.has = {} end
-function SYM:init() self.has = {} end
+function NUM:init() self.ns = {} end
+function SYM:init() self.xs = {} end
 
 local function incs(col,t) 
   for _,x in pairs(t) do col:add(x) end; return x end
 
-function NUM:add(n) push(self.has,x) end
-function SYM:add(z) self.has[z] = (self.has[z] or 0) + 1 end
+function NUM:add(n) push(self.ns, n) end
+function SYM:add(x) self.xs[x] = (self.xs[x] or 0) + 1 end
 
-function NUM:mid() lst.per(self.has, .5) end
+function NUM:mid() lst.per(self.ns, .5) end
 function SYM:mid() 
   local v,k = 0,nil
-  for k1,v1 in pairs(self.has) do if v1>v then k,v=k1,v1 end end
+  for k1,v1 in pairs(self.xs) do if v1>v then k,v=k1,v1 end end
   return k end
 --------- --------- --------- --------- --------- --------- -----              

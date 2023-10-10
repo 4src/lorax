@@ -32,7 +32,11 @@ Please following the following code conventions.
 ## Type hints
 
 - If XX is a class name, then `xx`,  `xx1`  refers to an instance.
-- In function body, name your variables anything you like.
+- In function body, name your variables anything you like. But here are some conventions
+  - `_` usually denotes "do not care"
+  - `u` is often some table generated from `t`; e.g `u = map(t, oddp)`
+  - `k,v` often denotes the key and value of a list;   
+-  e.g. `for k,v in pairs(t) do...``
 - In function header:
   - `z` denotes anything at all; e.g. `z`
   - `s` denotes a string; e.g. `s,s1`
