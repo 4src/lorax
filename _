@@ -2,24 +2,24 @@
 for x in gawk lua5.3; do 
   command -v $x > /dev/null || sudo apt install $x; done
 
-,g() { ,gp; }
-,h() { ,help; }
-,j() { ,lua $*; }
-,s() { ,snips $*; }
+_g() { _gp; }
+_h() { _help; }
+_l() { _lua $*; }
+_s() { _snips $*; }
 
-,help() {  ## ,h          ;  show help
+_help() {  ## _h          ;  show help
   echo ""
   gawk 'BEGIN        {FS="[(][)][:space:]*[^#]+##[:space:]*"}
-        /^,/ && /##/ {printf("%-7s :%s\n",$1,$2) }' , ; }
+        /^_/ && /##/ {printf("%-7s :%s\n",$1,$2) }' _ ; }
 
-,gp() {  ## ,g          ;  commit all, push to github 
+_gp() {  ## _g          ;  commit all, push to github 
    git commit -am saving; git push; git status; }
 
-,julia() {  ## ,j file     ;  run julia. fast start-up
+_lua() {  ## _l file     ;  run lua. 
    f=$1; shift
    lua $f.lua $*; }
 
-,snips() { ## ,s file.md  ;  insert snips from code into markdown
+_snips() { ## _s file.md  ;  insert snips from code into markdown
   if  [[ -f "$1" ]]
   then 
     gawk 'function trim(s) {sub(/^[ \t\n]*/,"",s); sub(/[ \t\n]*$/,"",s); return s}

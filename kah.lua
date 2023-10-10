@@ -1,7 +1,8 @@
-local b4={}; for k,v in pairs(_EMV) do b4[k]=k end 
-local the,help = {},[[
+local l=require"lib"
+local str,lst  = l.str,l.lst
+local the,help = str.settings[[
 
-samplr.jl: sample the corners, not the middle
+kah.lua: sample the corners, not the middle
 (c) Tim Menzies <timm@ieee.org>, BSD-2 license
      
 OPTIONS:
@@ -16,55 +17,25 @@ OPTIONS:
   -r --reuse  do npt reuse parent node = true
   -s --seed   random number seed       = 937162211]]
 --------- --------- --------- --------- --------- --------- -----
-local lst,str = {},{}
-local kap,map,push = lst.kap, lst.map, lst.push
+local kap,map,o,oo = lst.kap, lst.map, str.o,str.oo
+local obj,push     = l.obj,lst.push
 
-help:gsub("\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)",
-           function(k,v) the[k]= str.make(v) end)
+local NUM,SYM,ROW,DATA = obj"NUM", obj"SYM", obj"ROW", obj"DATA"
 --------- --------- --------- --------- --------- --------- -----
-local id=0
-local function obj(s,    t)
-  t = {_name=s}
-  t.__index = t
-  return setmetatable(t, { __call=function(_,...)
-    id = id + 1
-    local i = setmetatable({_id=id},t)
-    return setmetatable(t.init(i,...) or i,t) end}) end
---------- --------- --------- --------- --------- --------- -----
-function NUM(i) i.has = {} end
-function SYM(i) i.has = {} end
+function COL(s) return  s:find("^[A-Z]") and NUM() or SYM() end
 
-function COL(s) s:find"^[A-Z]" and NUM() or SYM() end
+function NUM:init() self.has = {} end
+function SYM:init() self.has = {} end
 
-function incs(col,t) 
+local function incs(col,t) 
   for _,x in pairs(t) do col:add(x) end; return x end
 
-function NUM.add(i,x) push(i.has,x) end
-function SYM.add(i,x) t.has[x] = (t.has[x] or 0) + 1 end
+function NUM:add(n) push(self.has,x) end
+function SYM:add(z) self.has[z] = (self.has[z] or 0) + 1 end
 
-function NUM.mid(i,x) push(i.has,x) end
-function SYM.mid(i,x) t.has[x] = (t.has[x] or 0) + 1 end
-
-
---------- --------- --------- --------- --------- --------- -----
-function lst.push(t,x) t[1+#t]=x; return x end
-
-function lst.map(t,fun,    u) 
-  u={}; for k,v in pairs(t) do u[k] = fun(v) end; return u end
-
-function lst.kap(t,fun,    u,v1,k2) 
-  u={}; for k,v in pairs(t) do 
-          v1,k1=fun(k,v); u[k1==nil and (1+#u) or k1]=v1  end
-  return u end
-
---------- --------- --------- --------- --------- --------- -----
-function str.make(s)
-  return math.tointeger(s) or tonumber(s) or s=="true" or (
-         s ~="false" and s))
-
-function str.oo(x) print(str.o(x)); return x end
-function str.o(t,    fun,tmp) 
-  fun = function(k,v) return string.format(":%s %s",k,o(v)) end 
-  tmp = #t>0 and lst.map(t,o) or lst.sort(lst.kap(t,fun)
-  return (type(t) ~="table" and tostring(t) or 
-          "{"..table.concat(tmp)," ").."}") end                         
+function NUM:mid() lst.per(self.has, .5) end
+function SYM:mid() 
+  local v,k = 0,nil
+  for k1,v1 in pairs(self.has) do if v1>v then k,v=k1,v1 end end
+  return k end
+--------- --------- --------- --------- --------- --------- -----              
