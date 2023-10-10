@@ -1,0 +1,41 @@
+#!/usr/bin/env bash 
+for x in gawk lua; do 
+  command -v $x > /dev/null || sudo apt install $x; done
+
+,g() { ,gp; }
+,h() { ,help; }
+,j() { ,lua $*; }
+,s() { ,snips $*; }
+
+,help() {  ## ,h          ;  show help
+  echo ""
+  gawk 'BEGIN        {FS="[(][)][:space:]*[^#]+##[:space:]*"}
+        /^,/ && /##/ {printf("%-7s :%s\n",$1,$2) }' , ; }
+
+,gp() {  ## ,g          ;  commit all, push to github 
+   git commit -am saving; git push; git status; }
+
+,julia() {  ## ,j file     ;  run julia. fast start-up
+   f=$1; shift
+   lua $f.lua $*; }
+
+,snips() { ## ,s file.md  ;  insert snips from code into markdown
+  if  [[ -f "$1" ]]
+  then 
+    gawk 'function trim(s) {sub(/^[ \t\n]*/,"",s); sub(/[ \t\n]*$/,"",s); return s}
+
+    PASS==1 && /^##/      { k="<"FILENAME" "$2">"    ; next     }
+    PASS==1               { SNIP[k] = SNIP[k] sep $0 ; sep="\n" }
+    PASS==2               { print }
+    PASS==2 && /```julia/ { k=$2" "$3   
+                            print(trim(SNIP[k]),"\n```")
+                            USED[k]++
+                            while(getline x >0) if (x ~ /^```/) break } 
+    END { for(k in SNIP)
+            if (USED[k] != 1) {
+              print("?? used "(USED[k]+0)" time(s) "k)>"/dev/stderr" } }
+    ' PASS=1 *.lua PASS=2 $1 > _tmp
+    mv _tmp $1 
+  else 
+    echo "missing $1.md or gawk"
+  fi ; }
