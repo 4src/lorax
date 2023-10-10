@@ -1,5 +1,5 @@
 #!/usr/bin/env bash 
-for x in gawk lua; do 
+for x in gawk lua5.3; do 
   command -v $x > /dev/null || sudo apt install $x; done
 
 ,g() { ,gp; }
