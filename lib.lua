@@ -114,7 +114,6 @@ function str.csv(sFilename,fun,     src,s)
   while true do
     s = io.read()
     if s then fun(str.make(s)) else return io.close(src) end end end
-    
 
 function str.oo(x) print(str.o(x)); return x end
 
