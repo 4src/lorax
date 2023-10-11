@@ -2,10 +2,10 @@ local b4={}; for k,v in pairs(_ENV) do b4[k]=k end
 local function rogues()
   for k,v in pairs(_ENV) do
     if not b4[k] then 
-       print(str.fmt("#W ?%s %s",k,type(v)) ) end end end
+       print(string.format("#W ?%s %s",k,type(v)) ) end end end
 
 --------- --------- --------- --------- --------- --------- -----
-local lst,str, mathx, sort, rand = {},{},{},{},{}
+local lst,str,mathx,sort,rand,go = {},{},{},{},{},{}
 --------- --------- --------- --------- --------- --------- -----
 local id=0
 local function obj(s,    t)
@@ -47,9 +47,15 @@ function sort.keysort(t,fun,      decorated,sorted,undecorated)
   undecorated = lst.map(sorted, function(z) return z.x  end)
   return undecorated end
 --------- --------- --------- --------- --------- --------- -----
-function mathx.median(ns,p) return lst.per(ns, .5) end
-function mathx.stdev(ns,p) 
-  return (lst.per(ns, .9) - lst.per(ns, .1))/2.56 end
+local p=lst.per
+
+function mathx.median(ns) return p(ns, .5) end
+function mathx.stdev(ns)  return (p(ns, .9) - p(ns, .1))/2.56 end
+
+function mathx.entropy(xs,     e,N)
+  N=0; for _,n in pairs(xs) do N = N + n end
+  e=0; for _,n in pairs(xs) do e = e - n/N*math.log(n/N,2) end
+  return e end
 
 function mathx.rnd(num, digits,    mult)
   if type(num) ~= "number" then return num end
@@ -82,18 +88,53 @@ function str.make(s)
 function str.settings(help,    settings)
   settings={}
   for k,s in help:gmatch(
-           "\n[%s]+.*[-][-]([%S]+)[^=]+=[%s]+([%S]+)") do
-           --"\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)") do
+           "\n[%s]+[-][%S][%s]+[-][-]([%S]+)[^\n]+= ([%S]+)") do
     settings[k]= str.make(s) end
   return settings,help end
 
+function str.cli(t)
+  for k,v in pairs(t) do
+    v = tostring(v)
+    for n,x in ipairs(arg) do
+      if x=="-"..(k:sub(1,1)) or x=="--"..k then
+        v= ((v=="false" and "true") or (v=="true" and "false")
+            or arg[n+1]) 
+        t[k] = str.make(v) end end end
+  return t end
+
 function str.oo(x) print(str.o(x)); return x end
+
 function str.o(t,     fun,tmp) 
   function fun (k,v) if not k:find"^_" then
     return string.format(":%s %s",k,str.o(v)) end end
-  tmp = #t>0 and lst.map(t,str.o) or lst.sorted(lst.kap(t,fun))
-  return (type(t) ~="table" and tostring(t) or (
-          (t._name or "").."{"..table.concat(tmp," ").."}")) end
+  if type(t) ~= "table" then return tostring(t) end
+  tmp = #t>0 and lst.map(t,str.o) or sort.sorted(lst.kap(t,fun))
+  return (t._name or "").."{"..table.concat(tmp," ").."}" end
+--------- --------- --------- --------- --------- --------- -----
+function go.one(the,eg1,    b4)
+  b4={}; for k,v in pairs(the) do b4[k]=v end
+  rand.seed = the.seed
+  out = eg1.fun()
+  if out==false then println("❌ FAIL :", eg.tag) end
+  for k,v in pairs(b4) do the[k]=v end
+  return out end 
+
+function go.run(the,help,egs,    n)
+  str.cli(the)
+  egs = sort.sorted(egs, sort.lt"tag")
+  if the.help then
+    print(help,"\n\nACTIONS:")
+    for _,eg1 in pairs(egs) do
+      print(str.fmt("  lua kah.lua %-10s -- %s", eg1.tag, eg1.txt)) end
+  else
+    n=0
+    for _,eg1 in pairs(egs) do
+      for _,flag in pairs(arg) do
+        if flag == eg1.tag then 
+          if go.one(the,eg1)==false then
+              n=n+1 end end end end end
+  rogues()
+  os.exit(n) end
 --------- --------- --------- --------- --------- --------- -----
 return {obj=obj, str=str, lst=lst, mathx=math, rand=rand,
-        sort =sort}
+        sort=sort, go=go}

@@ -1,6 +1,5 @@
-local l=require"lib"
-local egs=require"egs"
-local str,lst  = l.str,l.lst
+local l=require"lib" 
+local str,lst,mathx  = l.str,l.lst,l.mathx
 local the,help = str.settings[[
 
 kah.lua: sample the corners, not the middle
@@ -23,7 +22,7 @@ local obj,push     = l.obj, lst.push
 
 local NUM,SYM,ROW,DATA = obj"NUM", obj"SYM", obj"ROW", obj"DATA"
 --------- --------- --------- --------- --------- --------- -----
-function COL(s) return  s:find("^[A-Z]") and NUM() or SYM() end
+local function COL(s) return  s:find("^[A-Z]") and NUM() or SYM() end
 
 function NUM:init() self.ns = {} end
 function SYM:init() self.xs = {} end
@@ -34,9 +33,15 @@ local function incs(col,t)
 function NUM:add(n) push(self.ns, n) end
 function SYM:add(x) self.xs[x] = (self.xs[x] or 0) + 1 end
 
-function NUM:mid() lst.per(self.ns, .5) end
+function NUM:mid() return mathx.median(self.ns) end
 function SYM:mid() 
   local v,k = 0,nil
   for k1,v1 in pairs(self.xs) do if v1>v then k,v=k1,v1 end end
   return k end
---------- --------- --------- --------- --------- --------- -----              
+
+function NUM:div() return mathx.stdev(self.ns) end
+function SYM:div() return mathx.ent(self.xs) end
+--------- --------- --------- --------- --------- --------- -----  
+
+return {NUM=NUM, SYM=SYM, ROW=ROW, DATA=DATA,
+        the=the, help=help}

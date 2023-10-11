@@ -26,7 +26,7 @@ local big = 1E30
 local fmt = string.format
 local max,min,log,exp,pi = math.max,math.min,math.log,math.exp,math.pi
 -----------------------------------------------------------------------
-local Data,Num,Row,Sym = is"Data", is"Num",  is"Row", is"Sym"
+local DATA,NUM,ROW,SYM = is"DATA", is"NUM",  is"ROW", is"Sym"
 -----------------------------------------------------------------------
 function Num.new(at,txt)
   return {_is=Num, n=0, at=at or 0, txt=txt or "",
@@ -54,13 +54,13 @@ function Sym.add(i,s,     d)
   if s ~= "?" then
     i.n = i.n + 1
     i.has[s] = (i.has[s] or 0) + 1
-    if i.has[s] > i.most: i.most, i.mode = i.has[s],s end end end 
+    if i.has[s] > i.most gh i.most, i.mode = i.has[s],s end end end 
     
 function Sym.mid(i)          return i.mode end
 function Sym.div(i)          return stat.entropy(i.has) end
 function Sym.like(i,x,prior) return ((i.has[x] or 0) + the.m*prior)/(i.n+the.m) end
 -----------------------------------------------------------------------
-function Cols.new(t,    col,i,what)
+function COLS.new(t,    col,i,what)
   i = {_is=Cols, x={}, y={}, all={}, names=t}
   for at,txt in pairs(t) do
     col = push(i.cols, (txt:find"^[A-Z]" and NUM or SYM).new(at,txt))
@@ -68,7 +68,7 @@ function Cols.new(t,    col,i,what)
       push(col.txt:find"[+-]$" and i.y or i.x, col) end end
   return i end
 
-function Cols.add(i,t)
+function COLS.add(i,t)
   for _,xy in pairs{i.x, i.y} do for _,j in pairs(xy) do add(j, t[c.at]) end end
   return row end
 -----------------------------------------------------------------------
