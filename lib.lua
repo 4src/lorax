@@ -3,7 +3,6 @@ local function rogues()
   for k,v in pairs(_ENV) do
     if not b4[k] then 
        print(string.format("#W ?%s %s",k,type(v)) ) end end end
-
 --------- --------- --------- --------- --------- --------- -----
 local lst,str,mathx,sort,rand,go = {},{},{},{},{},{}
 --------- --------- --------- --------- --------- --------- -----
@@ -57,7 +56,7 @@ function mathx.entropy(xs,     e,N)
   e=0; for _,n in pairs(xs) do e = e - n/N*math.log(n/N,2) end
   return e end
 
-function mathx.rnd(num, digits,    mult)
+function mathx.rnd(num,  digits,    mult)
   if type(num) ~= "number" then return num end
   if math.floor(num) == num then return num end
   mult = 10^(digits or 0)
@@ -102,6 +101,13 @@ function str.cli(t)
         t[k] = str.make(v) end end end
   return t end
 
+function str.csv(sFilename,fun,     src,s)
+  src = io.input(sFilename)
+  while true do
+    s = io.read()
+    if s then fun(str.make(s)) else return io.close(src) end end end
+    
+
 function str.oo(x) print(str.o(x)); return x end
 
 function str.o(t,     fun,tmp) 
@@ -121,7 +127,6 @@ function go.one(the,eg1,    b4)
 
 function go.run(the,help,egs,    n)
   str.cli(the)
-  egs = sort.sorted(egs, sort.lt"tag")
   if the.help then
     print(help,"\n\nACTIONS:")
     for _,eg1 in pairs(egs) do

@@ -8,7 +8,7 @@ kah.lua: sample the corners, not the middle
 OPTIONS:
   -b --bins   initial number of bins   = 16
   -C --Cohen  too small                = .35
-  -f --file   csv data file            =  data/auto93.csv
+  -f --file   csv data file            = data/auto93.csv
   -F --Far    how far to look          = .95
   -h --help   show help                = false
   -H --Half   where to find for far    = 256
