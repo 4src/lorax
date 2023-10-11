@@ -19,6 +19,9 @@ function lst.push(t,x) t[1+#t]=x; return x end
 
 function lst.per(t,p) return t[p*#t//1] end
 
+function sum(t,     n)
+  n=0; for _,n1 in pairs(t) do n=n+n1 end; return n end end
+
 function lst.map(t,fun,    u) 
   u={}; for k,v in pairs(t) do u[k] = fun(v) end; return u end
 
@@ -128,21 +131,21 @@ function go.one(the,eg1,    b4,out)
   out = eg1.fun()
   if out==false then print("❌ FAIL :", eg1.tag) end
   for k,v in pairs(b4) do the[k]=v end
-  return out end 
+  return out end
 
-function go.run(the,help,egs,    n)
+function go.run(the,help,examples,    n)  
   str.cli(the)
   if the.help then
     print(help,"\n\nACTIONS:")
-    for _,eg1 in pairs(egs) do
-      print(str.fmt("  lua kah.lua %-10s -- %s", eg1.tag, eg1.txt)) end
+    for _,eg in pairs(examples) do
+      print(str.fmt("  lua kah.lua %-10s -- %s", eg.tag, eg.txt)) end
   else
     n=0
-    for _,eg1 in pairs(egs) do
+    for _,eg in pairs(examples) do
       for _,flag in pairs(arg) do
-        if flag == eg1.tag then 
-          if go.one(the,eg1)==false then
-              n=n+1 end end end end end
+        if flag == eg.tag then
+          if go.one(the,eg)==false then
+            n=n+1 end end end end end
   rogues()
   os.exit(n) end
 --------- --------- --------- --------- --------- --------- -----
