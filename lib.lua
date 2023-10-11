@@ -19,11 +19,8 @@ function lst.push(t,x) t[1+#t]=x; return x end
 
 function lst.per(t,p) return t[p*#t//1] end
 
-function sum(t,     n)
-  n=0; for _,n1 in pairs(t) do n=n+n1 end; return n end end
-
 function lst.map(t,fun,    u) 
-  u={}; for k,v in pairs(t) do u[k] = fun(v) end; return u end
+  u={}; for k,v in pairs(t) do u[k]=fun(v) end; return u end
 
 function lst.kap(t,fun,    u,v1,k1) 
   u={}; for k,v in pairs(t) do 
@@ -34,14 +31,16 @@ function lst.slice(t1, nGo, nStop, nInc,       t2)
   if nGo   and nGo   < 0 then nGo  = #t + nGo +1 end
   if nStop and nStop < 0 then nStop= #t + nStop  end
   u={}
-  for i=(nGo or 1)//1,(nStop or #t)//1,(nInc or 1)//1 do 
+  for i=(nGo or 1)//1,(nStop or #t)//1,(nInc or 1)//1 do
     u[1+#u]=t[i] end
   return u end
 --------- --------- --------- --------- --------- --------- -----
 function sort.sorted(t,fun) table.sort(t,fun); return t end
 
-function sort.lt(x) return function(t,u) return t[x] < u[x] end end
-function sort.gt(x) return function(t,u) return t[x] > u[x] end end 
+function sort.lt(x) 
+  return function(t,u) return t[x] < u[x] end end
+function sort.gt(x) 
+  return function(t,u) return t[x] > u[x] end end 
 
 function sort.keysort(t,fun,      decorated,sorted,undecorated)
   decorated   = lst.map(t, function(z) return {x=z, y=fun(z)} end)
