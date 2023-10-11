@@ -1,5 +1,5 @@
 local l=require"lib" 
-local str,lst,mathx  = l.str,l.lst,l.mathx
+local str,lst,m  = l.str,l.lst,l.mathx
 local the,help = str.settings[[
 
 kah.lua: sample the corners, not the middle
@@ -33,12 +33,11 @@ local function incs(col,t)
 function NUM:add(n) push(self.ns, n) end
 function SYM:add(x) self.xs[x] = (self.xs[x] or 0) + 1 end
 
-function NUM:mid() return mathx.median(self.ns) end
-function SYM:mid() return mathx.mode(self.xs) end
+function NUM:mid() return m.median(self.ns) end
+function SYM:mid() return m.mode(self.xs) end
 
-function NUM:div() return mathx.stdev(self.ns) end
-function SYM:div() return mathx.entropy(self.xs) end
+function NUM:div() return m.stdev(self.ns) end
+function SYM:div() return m.entropy(self.xs) end
 --------- --------- --------- --------- --------- --------- -----  
-
 return {NUM=NUM, SYM=SYM, ROW=ROW, DATA=DATA,
         the=the, help=help}
