@@ -38,9 +38,10 @@ Please following the following code conventions.
   - `k,v` often denotes the key and value of a list;   
 -  e.g. `for k,v in pairs(t) do...``
 - In function header:
-  - `z` denotes anything at all; e.g. `z`
+  - `x` denotes anything at all; e.g. `x`
   - `s` denotes a string; e.g. `s,s1`
   - `t,u` denotes  lists (or "table" in Lua speak); e.g. `t,t1,u,t1`
+    - and `u` is often sometime derived from `t`
   - `n` denotes a number; e.g. `n1`
   - `p` denotes a boolean; e.g. `usep`
   - `xs` denotes a list of `x`; e.g. `ss` is a list of strings

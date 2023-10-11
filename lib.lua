@@ -4,7 +4,7 @@ local function rogues()
     if not b4[k] then 
        print(string.format("#W ?%s %s",k,type(v)) ) end end end
 --------- --------- --------- --------- --------- --------- -----
-local lst,str,mathx,sort,rand,go = {},{},{},{},{},{}
+local lst,str,sort,rand,go,mathx = {},{},{},{},{},{}
 --------- --------- --------- --------- --------- --------- -----
 local id=0
 local function obj(s,    t)
@@ -28,17 +28,17 @@ function lst.kap(t,fun,    u,v1,k1)
   return u end
 
 function lst.slice(t1, nGo, nStop, nInc,       t2)
-  if nGo   and nGo   < 0 then nGo  = #t1 + nGo +1 end
-  if nStop and nStop < 0 then nStop= #t1 + nStop  end
-  t2={}
-  for i=(nGo or 1)//1,(nStop or #t1)//1,(nInc or 1)//1 do 
-    t2[1+#t2]=t1[i] end
-  return t2 end
+  if nGo   and nGo   < 0 then nGo  = #t + nGo +1 end
+  if nStop and nStop < 0 then nStop= #t + nStop  end
+  u={}
+  for i=(nGo or 1)//1,(nStop or #t)//1,(nInc or 1)//1 do 
+    u[1+#u]=t[i] end
+  return u end
 --------- --------- --------- --------- --------- --------- -----
 function sort.sorted(t,fun) table.sort(t,fun); return t end
 
-function sort.lt(x) return function(t1,t2) return t1[x] < t2[x] end end
-function sort.gt(x) return function(t1,t2) return t1[x] > t2[x] end end 
+function sort.lt(x) return function(t,u) return t[x] < u[x] end end
+function sort.gt(x) return function(t,u) return t[x] > u[x] end end 
 
 function sort.keysort(t,fun,      decorated,sorted,undecorated)
   decorated   = lst.map(t, function(z) return {x=z, y=fun(z)} end)
@@ -54,7 +54,12 @@ function mathx.stdev(ns)  return (p(ns, .9) - p(ns, .1))/2.56 end
 function mathx.entropy(xs,     e,N)
   N=0; for _,n in pairs(xs) do N = N + n end
   e=0; for _,n in pairs(xs) do e = e - n/N*math.log(n/N,2) end
-  return e end
+  return end
+
+function mathx.mode(xs)
+  local v,k = 0,nil
+  for k1,v1 in pairs(xs) do if v1>v then k,v=k1,v1 end end
+  return k end
 
 function mathx.rnd(num,  digits,    mult)
   if type(num) ~= "number" then return num end
@@ -117,11 +122,11 @@ function str.o(t,     fun,tmp)
   tmp = #t>0 and lst.map(t,str.o) or sort.sorted(lst.kap(t,fun))
   return (t._name or "").."{"..table.concat(tmp," ").."}" end
 --------- --------- --------- --------- --------- --------- -----
-function go.one(the,eg1,    b4)
+function go.one(the,eg1,    b4,out)
   b4={}; for k,v in pairs(the) do b4[k]=v end
   rand.seed = the.seed
   out = eg1.fun()
-  if out==false then println("❌ FAIL :", eg.tag) end
+  if out==false then print("❌ FAIL :", eg1.tag) end
   for k,v in pairs(b4) do the[k]=v end
   return out end 
 
@@ -141,5 +146,5 @@ function go.run(the,help,egs,    n)
   rogues()
   os.exit(n) end
 --------- --------- --------- --------- --------- --------- -----
-return {obj=obj, str=str, lst=lst, mathx=math, rand=rand,
+return {obj=obj, str=str, lst=lst, mathx=mathx, rand=rand,
         sort=sort, go=go}

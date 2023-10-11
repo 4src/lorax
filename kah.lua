@@ -34,13 +34,10 @@ function NUM:add(n) push(self.ns, n) end
 function SYM:add(x) self.xs[x] = (self.xs[x] or 0) + 1 end
 
 function NUM:mid() return mathx.median(self.ns) end
-function SYM:mid() 
-  local v,k = 0,nil
-  for k1,v1 in pairs(self.xs) do if v1>v then k,v=k1,v1 end end
-  return k end
+function SYM:mid() return mathx.mode(self.xs) end
 
 function NUM:div() return mathx.stdev(self.ns) end
-function SYM:div() return mathx.ent(self.xs) end
+function SYM:div() return mathx.entropy(self.xs) end
 --------- --------- --------- --------- --------- --------- -----  
 
 return {NUM=NUM, SYM=SYM, ROW=ROW, DATA=DATA,
