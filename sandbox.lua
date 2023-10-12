@@ -133,7 +133,8 @@ function eg.dist(     t,r1,r2,d)
   for i=1,20 do 
     r1,r2 = any(d.rows),  any(d.rows) 
     push(t, rnd(minkowski(d, r1, r2),2)) end 
-  oo(sorted(t))  end
+  oo(sorted(t)) 
+  return false end
 --------- --------- --------- --------- --------- --------- ----
 local function egs(     tmp,fails)
   the   = l.str.cli(the)
