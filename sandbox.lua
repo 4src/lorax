@@ -1,5 +1,5 @@
 local l    = require"lib"
-local the  = {file="data/auto93.csv",p=2, seed=1234567891,go="all"}
+local the  = {file="data/auto93.csv",p=2, seed=937162211,go="all"}
 
 local push = l.lst.push
 local m,o,oo,sorted = l.mathx, l.str.o, l.str.oo,l.sort.sorted
