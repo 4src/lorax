@@ -27,8 +27,8 @@ local function COL(s) return  s:find("^[A-Z]") and NUM() or SYM() end
 function NUM:init() self.ns = {} end
 function SYM:init() self.xs = {} end
 
-local function incs(col,t) 
-  for _,x in pairs(t) do col:add(x) end; return x end
+local function incs(col,t)
+  for _,x in pairs(t) do col:add(x) end; return col end
 
 function NUM:add(n) push(self.ns, n) end
 function SYM:add(x) self.xs[x] = (self.xs[x] or 0) + 1 end

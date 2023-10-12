@@ -27,7 +27,7 @@ function lst.kap(t,fun,    u,v1,k1)
           v1,k1=fun(k,v); u[k1==nil and (1+#u) or k1]=v1  end
   return u end
 
-function lst.slice(t1, nGo, nStop, nInc,       t2)
+function lst.slice(t, nGo, nStop, nInc,       u)
   if nGo   and nGo   < 0 then nGo  = #t + nGo +1 end
   if nStop and nStop < 0 then nStop= #t + nStop  end
   u={}
@@ -53,10 +53,10 @@ local p=lst.per
 function mathx.median(ns) return p(ns, .5) end
 function mathx.stdev(ns)  return (p(ns, .9) - p(ns, .1))/2.56 end
 
-function mathx.entropy(xs,     e,N)
+function mathx.ent(xs,     e,N)
   N=0; for _,n in pairs(xs) do N = N + n end
   e=0; for _,n in pairs(xs) do e = e - n/N*math.log(n/N,2) end
-  return end
+  return e end
 
 function mathx.mode(xs)
   local v,k = 0,nil
@@ -134,7 +134,6 @@ function str.o(x,     t,x1)
             x1 = str.o(v)
             return #x>0 and x1 or string.format(":%s %s", k, x1) end end)
   return (x._name or "").. "{" .. table.concat(#x==0 and sort.sorted(t) or t," ") .. "}" end
-
 
 function str.name(x)
   for k,v in pairs(_G) do if x==v then return k end end end
