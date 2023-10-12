@@ -2,7 +2,7 @@ local b4={}; for k,v in pairs(_ENV) do b4[k]=k end
 local function rogues()
   for k,v in pairs(_ENV) do
     if not b4[k] then 
-       print(string.format("#W ?%s %s",k,type(v)) ) end end end
+       print(string.format("#W ? %s %s",k,type(v)) ) end end end
 --------- --------- --------- --------- --------- --------- -----
 local lst,str,sort,rand,go,mathx = {},{},{},{},{},{}
 --------- --------- --------- --------- --------- --------- -----
@@ -64,8 +64,8 @@ function mathx.mode(xs)
   return k end
 
 function mathx.rnd(x,  digits,    mult)
-  if type(x) ~= "number"   then return x end
-  if type(x) ~= "function" then return str.name(x) or "" end
+  if type(x) ~= "number"   then return tostring(x) end
+  if type(x) == "function" then return "()" end
   if math.floor(x) == x    then return x end
   mult = 10^(digits or 0)
   return math.floor(x * mult + 0.5) / mult end
@@ -88,7 +88,10 @@ function rand.many(t1,n,    t2)
 --------- --------- --------- --------- --------- --------- -----
 str.fmt = string.format
 
+function str.trim(s)  return s:match'^%s*(.*%S)' or '' end
+
 function str.make(s)
+  s=str.trim(s)
   return math.tointeger(s) or tonumber(s) or (
          s=="true" or (s ~="false" and s)) end -- or false
 
@@ -109,23 +112,32 @@ function str.cli(t)
         t[k] = str.make(v) end end end
   return t end
 
+local function _makes(s,    t)
+  t={}; for s1 in s:gmatch("([^,]+)") do t[1+#t]=str.make(s1) end
+  return t end
+
 function str.csv(sFilename,fun,     src,s)
   src = io.input(sFilename)
   while true do
     s = io.read()
-    if s then fun(str.make(s)) else return io.close(src) end end end
+    if s then fun(_makes(s)) else return io.close(src) end end end
 
 function str.oo(x) print(str.o(x)); return x end
 
-function str.o(t,     fun,tmp) 
-  function fun (k,v) if not k:find"^_" then
-    return string.format(":%s %s",k,str.o(v)) end end
-  if type(t) ~= "table" then return tostring(t) end
-  tmp = #t>0 and lst.map(t,str.o) or sort.sorted(lst.kap(t,fun))
-  return (t._name or "").."{"..table.concat(tmp," ").."}" end
+function str.o(x,     t,x1)
+  if type(x) == "function" then return "()" end
+  if type(x) == "number"   then return tostring(x) end --tostring(mathx.rnd(x)) end 
+  if type(x) ~= "table"    then return tostring(x) end
+  t = lst.kap(x, 
+        function(k,v,     x1) 
+          if tostring(k):sub(1,1) ~= "_" then 
+            x1 = str.o(v)
+            return #x>0 and x1 or string.format(":%s %s", k, x1) end end)
+  return (x._name or "").. "{" .. table.concat(#x==0 and sort.sorted(t) or t," ") .. "}" end
+
 
 function str.name(x)
-  for k,v in pairs(_ENV) do if x==v then return s end end end
+  for k,v in pairs(_G) do if x==v then return k end end end
 --------- --------- --------- --------- --------- --------- -----
 function go.one(the,eg1,    b4,out)
   b4={}; for k,v in pairs(the) do b4[k]=v end
