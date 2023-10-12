@@ -2,29 +2,19 @@
 for x in gawk lua5.3 ispell; do 
   command -v $x > /dev/null || sudo apt install $x; done
 
-if [[ -z "$DASH" ]]; then
-  DASH="_"
-  PS1="$DASH$PS1";
-fi
-
-_g() { _gp; }
-_h() { _help; }
-_l() { _lua $*; }
-_s() { _snips $*; }
-
-_help() {  ## _h          ;  show help
+,h() {  ## ,h              ;  show help
   echo ""
   gawk 'BEGIN        {FS="[(][)][:space:]*[^#]+##[:space:]*"}
-        /^_/ && /##/ {printf("%-7s :%s\n",$1,$2) }' _ ; }
+        /^,/ && /##/ {printf("%-7s :%s\n",$1,$2) }' , ; }
 
-_gp() {  ## _g          ;  commit all, push to github 
+,gp() {  ## ,gp             ;  commit all, push to github 
    git commit -am saving; git push; git status; }
 
-_lua() {  ## _l file     ;  run lua. 
+,lua() {  ## ,lua file       ;  run lua. 
    f=$1; shift
    lua $f.lua $*; }
 
-_snips() { ## _s file.md  ;  insert snips from code into markdown
+,snips() { ## ,snips file.md  ;  insert snips from code into markdown
   if  [[ -f "$1" ]]
   then 
     gawk 'function trim(s) {sub(/^[ \t\n]*/,"",s); sub(/[ \t\n]*$/,"",s); return s}
@@ -45,6 +35,26 @@ _snips() { ## _s file.md  ;  insert snips from code into markdown
     echo "missing $1.md or gawk"
   fi ; }
 
-_spell() { ## _spell file.md  ;  spell check file
+,spell() { ## ,spell file.md  ;  spell check file
   ispell -x $1 ; }
   
+_hello() {
+  clear; tput bold; tput setaf 6; cat <<'EOF'
+::::::          
+'####:   
+ ####:   "Life is a series of commas,       
+. ##::           not periods."
+'##:::
+..::::
+
+EOF
+  tput sgr0
+}
+
+here() { cd $1; basename `pwd`; }    
+
+if  [ -z "$COMMA" ]; then
+  _hello
+  PROMPT_COMMAND='echo -ne "💫 $(git branch 2>/dev/null | grep '^*' | colrm 1 2):";PS1="$(here ..)/$(here .):\!\e[m ▶ "'     
+  COMMA=1 
+fi

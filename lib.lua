@@ -63,11 +63,12 @@ function mathx.mode(xs)
   for k1,v1 in pairs(xs) do if v1>v then k,v=k1,v1 end end
   return k end
 
-function mathx.rnd(num,  digits,    mult)
-  if type(num) ~= "number" then return num end
-  if math.floor(num) == num then return num end
+function mathx.rnd(x,  digits,    mult)
+  if type(x) ~= "number"   then return x end
+  if type(x) ~= "function" then return str.name(x) or "" end
+  if math.floor(x) == x    then return x end
   mult = 10^(digits or 0)
-  return math.floor(num * mult + 0.5) / mult end
+  return math.floor(x * mult + 0.5) / mult end
 --------- --------- --------- --------- --------- --------- -----
 rand.seed = 937162211
 
@@ -122,6 +123,9 @@ function str.o(t,     fun,tmp)
   if type(t) ~= "table" then return tostring(t) end
   tmp = #t>0 and lst.map(t,str.o) or sort.sorted(lst.kap(t,fun))
   return (t._name or "").."{"..table.concat(tmp," ").."}" end
+
+function str.name(x)
+  for k,v in pairs(_ENV) do if x==v then return s end end end
 --------- --------- --------- --------- --------- --------- -----
 function go.one(the,eg1,    b4,out)
   b4={}; for k,v in pairs(the) do b4[k]=v end
@@ -148,4 +152,4 @@ function go.run(the,help,examples,    n)
   os.exit(n) end
 --------- --------- --------- --------- --------- --------- -----
 return {obj=obj, str=str, lst=lst, mathx=mathx, rand=rand,
-        sort=sort, go=go}
+        sort=sort, go=go, rogues=rogues}

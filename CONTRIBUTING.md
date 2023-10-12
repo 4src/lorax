@@ -62,10 +62,9 @@ Please following the following code conventions.
 - Stored in a local `eg` in a file called `egs.lua`.
 - Named (e.g.) `eg.tag_help_text()` where `tag` is how we can call it from the
   command line and `help_text` is what is displayed in help text (with the `_`
-  replaced by a space),
-- Tests will run in any order.
+  replaced by a space), 
 - Tests that return `false` will add 1 to a `fails` counter.
-- When tests terminate, they return `fails` to the operating system.
+  - And when tests terminate, they return `fails` to the operating system.
 
 ## Make tools and short cuts
 

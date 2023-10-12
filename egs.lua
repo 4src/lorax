@@ -1,7 +1,7 @@
 local k = require"kah"
 local l = require"lib"
-local the, oo, go, push = k.the, l.str.oo, l.go, l.lst.push
-local go = l.go
+local the, o, oo  = k.the, l.str.o, l.str.oo
+local go, push = l.go, l.lst.push
 
 local egs={}
 local function eg(k,s,fun) push(egs,{tag=k,txt=s,fun=fun}) end
