@@ -4,7 +4,7 @@ local push = l.lst.push
 local o,oo = l.str.o, l.str.oo
 local COLS,cols,COL,col,DATA,data,div,has,mid,NUM,ROW,stats,SYM
 --------- --------- --------- --------- --------- --------- -----
-function ROW(t)   return {cells=t, w=1} end
+function ROW(t)   return {is=ROW, cells=t, w=1} end
 --------- --------- --------- --------- --------- --------- -----
 function SYM(n,s) return {is=SYM,at=n,txt=s,has={}} end
 function NUM(n,s) return {is=NUM,at=n,txt=s,ok=false,has={}} end
@@ -45,7 +45,7 @@ function cols(cols1,row)
   return row end
 --------- --------- --------- --------- --------- --------- -----
 function DATA(src,      data1)
-  data1 = {rows={}, cols=nil} 
+  data1 = {is=DATA, rows={}, cols=nil} 
   if   type(src)=="string" 
   then l.str.csv(src, function(t) data(data1, ROW(t)) end) 
   else for _,row in pairs(src or {}) do data(data1, row) end 
