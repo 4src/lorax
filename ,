@@ -38,7 +38,7 @@ for x in gawk lua5.3 ispell; do
 ,spell() { ## ,spell file.md  ;  spell check file
   ispell -x $1 ; }
   
-,tests() { ## ,tests.         ;  run tests, update README badge
+,tests() { ## ,tests          ;  run tests, update README badge
   s='1c![](https://img.shields.io/badge/tests-failing-red)'
   if lua sandbox.lua -g all ; then
     s='1c![](https://img.shields.io/badge/tests-passing-green)'
