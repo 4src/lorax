@@ -116,11 +116,17 @@ local function _makes(s,    t)
   t={}; for s1 in s:gmatch("([^,]+)") do t[1+#t]=str.make(s1) end
   return t end
 
-function str.csv(sFilename,fun,     src,s)
-  src = io.input(sFilename)
-  while true do
-    s = io.read()
-    if s then fun(_makes(s)) else return io.close(src) end end end
+-- function str.csv(sFilename,fun,     src,s)
+--   src = io.input(sFilename)
+--   while true do
+--     s = io.read()
+--     if s then fun(_makes(s)) else return io.close(src) end end end
+  
+  function str.csv(sFilename,     src)
+    src = io.input(sFilename)
+    return function(     s)
+      s = io.read()
+      if s then return _makes(s) else io.close(src) end end end
 
 function str.oo(x) print(str.o(x)); return x end
 

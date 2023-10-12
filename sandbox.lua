@@ -4,6 +4,8 @@ local the  = {file="data/auto93.csv",p=2, seed=1234567891,go="all"}
 local push = l.lst.push
 local m,o,oo,sorted = l.mathx, l.str.o, l.str.oo,l.sort.sorted
 local rnd,any= m.rnd,l.rand.any
+local kap = l.lst.kap
+local lt = l.sort.lt
 local csv = l.str.csv
 
 local aha,at,clone,cols,col,data
@@ -37,7 +39,7 @@ function ok(col1)
 
 function mid(col1)
   if   col1.ako=="NUM"
-  then return m.median(ok(col1)._has) 
+  then return m.median(ok(col1)._has)
   else return m.mode(col1.has) end end
 
 function div(col1)
@@ -65,10 +67,10 @@ function cols(cols1,row1,     x)
       col(col1, at(row1,col1)) end end
   return row1 end
 --------- --------- --------- --------- --------- --------- -----
-function DATA(src, data1)
+function DATA(src,     data1)
   data1  = {ako="DATA", rows={}, cols=nil}
   if   type(src)=="string"
-  then csv(src, function(t) data(data1, ROW(t)) end)
+  then for t      in csv(src)         do data(data1, ROW(t)) end
   else for _,row1 in pairs(src or {}) do data(data1, row1) end
   end
   return data1 end
@@ -78,10 +80,8 @@ function data(data1,row1)
   then push(data1.rows, cols(data1.cols, row1))
   else data1.cols = COLS(row1.cells) end end
 
-function clone(data1,rows,     data2)
-  oo(data1.cols.names)
-  data2 = DATA({data1.cols.names})
-  print(data2)
+function clone(data1,rows,    data2) 
+  data2 = DATA({ROW(data1.cols.names)}) 
   for _,row1 in pairs(rows or {} ) do data(data2,row1) end
   return data2 end
 
@@ -90,7 +90,6 @@ function stats(data1,  fun,cols1,nDigits,    t)
   for _,col1 in pairs(cols1 or data1.cols.y) do
     t[col1.txt] = rnd((fun or mid)(col1), nDigits) end
   return t end
- 
 --------- --------- --------- --------- --------- --------- -----
 function minkowski(data1,row1,row2,      n,d)
   n,d = 0,0
@@ -127,10 +126,8 @@ function eg.stats(     d)
 
 function eg.clone(      d1)
   d1=DATA(the.file)
-  print("mid1",o(stats(d1)))
-  clone(d1,  d1.rows)
-  --print("mid2",o(stats(clone(d1,d1.rows))))
-end
+  print("original", o(stats(d1)))
+  print("cloned. ", o(stats(clone(d1,  d1.rows)))) end
 
 function eg.dist(     t,r1,r2,d)
   t,d={},DATA(the.file); 
@@ -138,16 +135,17 @@ function eg.dist(     t,r1,r2,d)
     r1,r2 = any(d.rows),  any(d.rows) 
     push(t, rnd(minkowski(d, r1, r2),2)) end 
   oo(sorted(t))  end
-
-local function egs()
-  local fails=0
+--------- --------- --------- --------- --------- --------- ----
+local function egs(     tmp,fails)
   the = l.str.cli(the)
-  for k,fun in pairs(eg) do
-    if the.go==k or the.go=="all" then
+  tmp = kap(eg, function(k,v) return {key=k,fun=v} end)
+  fails=0
+  for _,one in pairs(sorted(tmp, lt"key")) do
+    if the.go==one.key or the.go=="all" then
       l.rand.seed = the.seed
-      if fun()==false then
+      if one.fun()==false then
         fails = fails + 1
-        print("❌ FAIL : ".. k) end end end
+        print("❌ FAIL : ".. one.key) end end end
   l.rogues()
   os.exit(fails - 1) end
 
