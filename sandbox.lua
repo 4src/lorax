@@ -64,24 +64,23 @@ function COLS(t,     all,x,y,col1)
 function cols(cols1,row1,     x)
   for _,xy in pairs{cols1.x, cols1.y} do
     for _,col1 in pairs(xy) do 
-      col(col1, at(row1,col1)) end end
-  return row1 end
+      col(col1, at(row1,col1)) end end end
 --------- --------- --------- --------- --------- --------- -----
 function DATA(src,     data1)
   data1  = {ako="DATA", rows={}, cols=nil}
   if   type(src)=="string"
   then for t      in csv(src)         do data(data1, ROW(t)) end
-  else for _,row1 in pairs(src or {}) do data(data1, row1) end
+  else for _,row1 in pairs(src or {}) do data(data1, row1)   end
   end
   return data1 end
 
 function data(data1,row1)
   if   data1.cols
-  then push(data1.rows, cols(data1.cols, row1))
+  then cols(data1.cols, push(data1.rows,row1))
   else data1.cols = COLS(row1.cells) end end
 
 function clone(data1,rows,    data2) 
-  data2 = DATA({ROW(data1.cols.names)}) 
+  data2 = DATA({ROW(data1.cols.names)})
   for _,row1 in pairs(rows or {} ) do data(data2,row1) end
   return data2 end
 
@@ -127,7 +126,7 @@ function eg.stats(     d)
 function eg.clone(      d1)
   d1=DATA(the.file)
   print("original", o(stats(d1)))
-  print("cloned. ", o(stats(clone(d1,  d1.rows)))) end
+  print("cloned  ", o(stats(clone(d1,  d1.rows)))) end
 
 function eg.dist(     t,r1,r2,d)
   t,d={},DATA(the.file); 
@@ -137,9 +136,9 @@ function eg.dist(     t,r1,r2,d)
   oo(sorted(t))  end
 --------- --------- --------- --------- --------- --------- ----
 local function egs(     tmp,fails)
-  the = l.str.cli(the)
-  tmp = kap(eg, function(k,v) return {key=k,fun=v} end)
-  fails=0
+  the   = l.str.cli(the)
+  tmp   = kap(eg,function(key,fun) return {key=key,fun=fun} end)
+  fails = 0
   for _,one in pairs(sorted(tmp, lt"key")) do
     if the.go==one.key or the.go=="all" then
       l.rand.seed = the.seed

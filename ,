@@ -51,6 +51,13 @@ EOF
   tput sgr0
 }
 
+_tests() { 
+  s='1c<tests>![](https://img.shields.io/badge/tests-failing-red)'
+  if lua sandbox.lua -g all ; then
+    s='1c<tests>![](https://img.shields.io/badge/tests-passing-green)'
+  fi
+  sed -i $s README.md; }
+
 here() { cd $1; basename `pwd`; }    
 
 if  [ -z "$COMMA" ]; then
