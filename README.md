@@ -5,7 +5,7 @@
 [![](https://img.shields.io/badge/license-BSD2-yellow)](LICENSE.md)
 
 
-# kah
+# lorax
 
 Explore `N` options after evaluating `log(log(N))` examples.
 
