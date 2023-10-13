@@ -1,6 +1,17 @@
 #!/usr/bin/env bash 
+#unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
 for x in gawk lua5.3 ispell; do 
-  command -v $x > /dev/null || sudo apt install $x; done
+  if [ "$machine" == "Linux" ]; then
+    command -v $x > /dev/null || sudo apt install $x
+  else
+    echo "Please ensure $x is installed"
+  fi
+done
 
 h() {  ## ,h              ;  show help
   printf "\nACTIONS:\n"
@@ -47,7 +58,8 @@ tests() { ## ,tests          ;  run tests, update README badge
   sed -i $s $H/README.md; }
 
 _hello() {
-  clear; tput bold; tput setaf 6; cat <<'EOF'
+  tput bold; tput setaf 6; cat <<'EOF'
+
       _)\##
   ###/((_
        ))\####      UNLESS someone like you
