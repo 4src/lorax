@@ -5,10 +5,9 @@
 [![](https://img.shields.io/badge/license-BSD2-yellow)](LICENSE.md)
 
 
+<img align=right src="etc/img/lorax.png">
 
 # LORAX
-
-<img align=right src="etc/img/lorax.png">
 
 **LORAX** = LORAX Optimizes and Renders AI eXplanations**
 
