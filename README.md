@@ -5,13 +5,13 @@
 [![](https://img.shields.io/badge/license-BSD2-yellow)](LICENSE.md)
 
 
+
 # LORAX
 
-![](etc/img/lorax.png)
+<img align=right src="etc/img/lorax.png">
 
-LORAX = LORAX Optimizes and Renders AI eXplanations
+## LORAX = LORAX Optimizes and Renders AI eXplanations
 
 Explore `N` options after evaluating `log(log(N))` examples.
 
-Find two distant points. Score them _best, rest_.  
-Prune everything closest to _rest_. Recurse on the remaining.
+Find two distant points. Score them _best, rest_.   Prune everything closest to _rest_. Recurse on the remaining.

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash 
-#unameOut="$(uname -s)"
+unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
 for x in gawk lua5.3 ispell; do 
-  if [ "$machine" == "Linux" ]; then
+  if [ "$machine"=="Linux" ]; then
     command -v $x > /dev/null || sudo apt install $x
   else
     echo "Please ensure $x is installed"
@@ -16,7 +16,7 @@ done
 h() {  ## ,h              ;  show help
   printf "\nACTIONS:\n"
   gawk 'BEGIN        {FS="[(][)][:space:]*[^#]+##[:space:]*"}
-        /^,/ && /##/ {printf(" %s\n",$2) }' , ; }
+        /^,/ && /##/ {printf(" %s\n",$2) }' $H/etc/h ; }
 
 gp() {  ## gp             ;  commit all, push to github 
    git commit -am saving; git push; git status; }
