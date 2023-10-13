@@ -5,7 +5,11 @@
 [![](https://img.shields.io/badge/license-BSD2-yellow)](LICENSE.md)
 
 
-# lorax
+# LORAX
+
+![](etc/img/lorax.png)
+
+LORAX = LORAX Optimizes and Renders AI eXplanations
 
 Explore `N` options after evaluating `log(log(N))` examples.
 
