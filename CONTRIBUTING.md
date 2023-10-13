@@ -2,6 +2,14 @@
 
 Please following the following code conventions.
 
+## Documentation
+
+- All .lua files max line = 65 characters (so we we lay out code in two-column
+  latex files)
+- Minimal doc in X.lua files; instead use X.md and the `,snips` tool to add
+  in code samples between Markdown
+- If a line is only `end` then consider appending it to line above.
+
 ## Modules
 
 - Divide code into chunks small enough to include into less than
@@ -35,8 +43,8 @@ Please following the following code conventions.
 - In function body, name your variables anything you like. But here are some conventions
   - `_` usually denotes "do not care"
   - `u` is often some table generated from `t`; e.g `u = map(t, oddp)`
-  - `k,v` often denotes the key and value of a list;   
--  e.g. `for k,v in pairs(t) do...``
+  - `k,v` often denotes the key and value of a list;
+- e.g. `for k,v in pairs(t) do...``
 - In function header:
   - `x` denotes anything at all; e.g. `x`
   - `s` denotes a string; e.g. `s,s1`
@@ -48,21 +56,13 @@ Please following the following code conventions.
   - two spaces denotes start of optional parameters
   - four spaces denotes start of local parameters.
 
-## Documentation
-
-- All .lua files max line = 65 characters (so we we lay out code in two-column
-  latex files)
-- Minimal doc in X.lua files; instead use X.md and the `_snips` tool to add
-  in code samples between Markdown
-- If a line is only `end` then consider appending it to line above.
-- Try to write a test suite that demos the code.
-
 ## Tests
 
-- Stored in a local `eg` in a file called `egs.lua`.
+- Try to write a test suite that demos the code.
+- Stored the tests in a local `eg` .
 - Named (e.g.) `eg.tag_help_text()` where `tag` is how we can call it from the
   command line and `help_text` is what is displayed in help text (with the `_`
-  replaced by a space), 
+  replaced by a space),
 - Tests that return `false` will add 1 to a `fails` counter.
   - And when tests terminate, they return `fails` to the operating system.
 

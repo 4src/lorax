@@ -7,7 +7,7 @@ local m,o,oo,sorted = l.mathx, l.str.o, l.str.oo,l.sort.sorted
 local keysort,lt    = l.sort.keysort,l.sort.lt
 local rnd,any,many  = m.rnd, l.rand.any, l.rand.many
 local kap,slice     = l.lst.kap,l.lst.slice
-local min           = math.min
+local min      = math.min
 
 local aha,at,clone,cols,col,corners,data,d2h
 local div,half,mid,minkowski,neighbors,norm,ok,stats
@@ -118,18 +118,18 @@ function neighbors(data1,row1,rows,     fun)
   fun = function(row2) return minkowski(data1,row1,row2) end
   return keysort(rows or data1.rows, fun) end
 --------- --------- --------- --------- --------- --------- ----
-function corners(data1,rows,row1,     far,row1,row2)
-  far  = (#rows*the.Far)//1
-  row1 = row1 or neighbors(data1, any(rows), rows)[far]
-  row2 = neighbors(data1, row1, rows)[far]
-  return row1,row2, minkowski(data1,row1,row2) end
+function corners(data1,rows,sortp,a,  far,row1,row2)
+  far = (#rows*the.Far)//1
+  a   = a or neighbors(data1, any(rows), rows)[far]
+  b   = neighbors(data1, a, rows)[far]
+  if sortp and d2h(data1,b) < d2h(data1,a) then a,b=b,a end
+  return a, b, minkowski(data1,a,b) end
 
-function half(data1,rows,b4,    a,b,C,d,cos,lo,hi)
-  a,b,C = corners(data1, many(rows, min(the.Half, #rows)),b4)
-  if d2h(data1,b) < d2h(data1,a) then a,b = b,a end
-  d  = function(r1,r2) return minkowski(data1,r1,r2) end
-  cos= function(r) return (d(r,a)^2 + C^2 - d(r,b)^2)/(2*C) end
-  lo,hi = {},{}
+function half(data1,rows,b4,sortp,    a,b,C,d,cos,lo,hi)
+  a,b,C= corners(data1,many(rows,min(the.Half,#rows)),sortp,b4) 
+  d    = function(r1,r2) return minkowski(data1,r1,r2) end
+  cos  = function(r) return (d(r,a)^2+ C^2 - d(r,b)^2)/(2*C) end
+  lo,hi= {},{}
   for n,row1 in pairs(keysort(rows,cos)) do 
     push(n <=(#rows)//2 and lo or hi, row1) end
   return a,b,lo,hi end
@@ -147,24 +147,39 @@ function tree(data1,sorted)
 local eg = {}
 function eg.fails() return false end
 
-function eg.data(      d)
-  d=DATA(the.file); oo(d.cols["y"][1])
-  return #d.rows==398 end
-
-function eg.ent(s)
+function eg.sym(s)
   s=SYM()
   for _,x in pairs{1,1,1,1,2,2,3} do col(s,x) end
   return 1.37< m.ent(s.has) and m.ent(s.has)< 1.38 end
+
+function eg.num(     n,r,stdev)
+  n,r = NUM(), l.rand.rand
+  for i=1,100 do col(n, i) end
+  m,sd = mid(n), div(n) 
+  return 49 < m and m < 51 and 30 < sd and sd < 32 end
+
+function eg.csv(      n)
+  n=0; for t in csv(the.file) do n = n + #t end 
+  return n ==399*8 end  
+    
+function eg.data(      d)
+  d=DATA(the.file); oo(d.cols["y"][1])
+  return #d.rows==398 end
 
 function eg.stats(     d)
   d=DATA(the.file)
   print("mid",o(stats(d)))
   print("div",o(stats(d,div,d.cols["x"]))) end
 
-function eg.clone(      d1)
-  d1=DATA(the.file)
-  print("original", o(stats(d1)))
-  print("cloned  ", o(stats(clone(d1,  d1.rows)))) end
+function eg.clone(      d1,s1,s2,good)
+  d1  = DATA(the.file)
+  s1  = stats(d1)
+  s2  = stats(clone(d1,  d1.rows))
+  good= true
+  for k,v in pairs(s1) do good = good and v == s2[k] end 
+  print("original", o(s1))
+  print("cloned  ", o(s2))
+  return good end
 
 function eg.dist(     t,r1,r2,d)
   t,d={},DATA(the.file); 
@@ -173,7 +188,7 @@ function eg.dist(     t,r1,r2,d)
     push(t, rnd(minkowski(d, r1, r2),2)) end 
   oo(sorted(t)) end
 
-function eg.d2h(     t,r1,r2,d)
+function eg.heaven(     t,r1,r2,d)
   t,d={},DATA(the.file); 
   for i=1,20 do 
     r1  = any(d.rows)
@@ -185,7 +200,8 @@ function eg.heavens(     t,d,n)
   n = (#d.rows) ^.5
   t = keysort(d.rows, function(r) return d2h(d,r) end) 
   print("best", o(stats(clone(d, slice(t,1,n)))))
-  print("worst", o(stats(clone(d, slice(t,-n))))) end
+  print("worst", o(stats(clone(d, slice(t,-n))))) 
+end
 
 function eg.neighbors(     t,d,n)
   d = DATA(the.file)
@@ -206,7 +222,7 @@ function eg.half(      _,a,b,d)
   _,_,a,b = half(d,d.rows) 
   print(#a, #b) end 
 --------- --------- --------- --------- --------- --------- ----
-local function egs(     tmp,fails)
+local function main(     tmp,fails)
   the   = l.str.cli(the)
   tmp   = kap(eg,function(key,fun) return {key=key,fun=fun} end)
   fails = 0
@@ -219,4 +235,6 @@ local function egs(     tmp,fails)
   l.rogues()
   os.exit(fails - 1) end
 
-egs()
+if not  pcall(debug.getlocal,4,1)  then main() end
+
+ 
