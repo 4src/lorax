@@ -1,15 +1,16 @@
 local l    = require"lib"
-local the  = {file="data/auto93.csv",p=2, seed=937162211,go="all"}
+local the  = {file="data/auto93.csv",p=2, Far=.95, 
+              seed=937162211, go="all", Half=256}
 
-local push = l.lst.push
+local push,csv      = l.lst.push, l.str.csv
 local m,o,oo,sorted = l.mathx, l.str.o, l.str.oo,l.sort.sorted
-local rnd,any= m.rnd,l.rand.any
-local kap = l.lst.kap
-local lt = l.sort.lt
-local csv = l.str.csv
+local keysort,lt    = l.sort.keysort,l.sort.lt
+local rnd,any,many  = m.rnd, l.rand.any, l.rand.many
+local kap,slice     = l.lst.kap,l.lst.slice
+local min           = math.min
 
-local aha,at,clone,cols,col,data
-local div,mid,minkowski,norm,ok,stats
+local aha,at,clone,cols,col,corners,data,d2h
+local div,half,mid,minkowski,neighbors,norm,ok,stats
 
 local COLS,COL,DATA,NUM,ROW,SYM
 --------- --------- --------- --------- --------- --------- -----
@@ -28,7 +29,7 @@ function col(col1,x)
   if     x=="?" then return x
   elseif col1.ako == "SYM"
   then   col1.has[x] = 1 + (col1.has[x] or 0)
-  else   push(col1._has,x)
+  else   push(col1._has, x)
          col1.ready = false end end
 
 function ok(col1)
@@ -51,7 +52,7 @@ function norm(col1,x,      t)
   if   x=="?" or col1.ako=="SYM"
   then return x
   else t = ok(col1)._has
-       return (x- t[1])/(t[#t] - t[1] + 1E-30) end end
+       return (x - t[1])/(t[#t] - t[1] + 1E-30) end end
 --------- --------- --------- --------- --------- --------- -----
 function COLS(t,     all,x,y,col1)
   all,x,y = {},{},{} 
@@ -89,15 +90,8 @@ function stats(data1,  fun,cols1,nDigits,    t)
   for _,col1 in pairs(cols1 or data1.cols.y) do
     t[col1.txt] = rnd((fun or mid)(col1), nDigits) end
   return t end
---------- --------- --------- --------- --------- --------- -----
-function minkowski(data1,row1,row2,      n,d)
-  n,d = 0,0
-  for _,col1 in pairs(data1.cols.y) do
-    n = n + 1
-    d = d + aha(col1, at(row1,col1), at(row2,col1))^the.p end
-  return (d/n) ^ (1/the.p) end
-
- function aha(col1, x,y)
+--------- --------- --------- --------- --------- --------- ----
+function aha(col1, x,y)
   if     x=="?" and y=="?" then return 1
   elseif col1.ako=="SYM"
   then   return x==y and 0 or 1
@@ -105,6 +99,50 @@ function minkowski(data1,row1,row2,      n,d)
          if x=="?" then x = y<.5 and 1 or 0 end
          if y=="?" then y = x<.5 and 1 or 0 end
          return math.abs(x - y) end end
+
+function minkowski(data1,row1,row2,      n,d)
+  n,d = 0,0
+  for _,col1 in pairs(data1.cols.y) do
+    n = n + 1
+    d = d + aha(col1, at(row1,col1), at(row2,col1))^the.p end
+  return (d/n) ^ (1/the.p) end
+
+function d2h(data1,row1,       n,d)
+  n,d = 0,0
+  for _,col1 in pairs(data1.cols.y) do
+    n = n + 1
+    d = d + (col1.heaven - norm(col1, at(row1,col1)))^2  end
+  return (d/n) ^ (1/the.p) end
+
+function neighbors(data1,row1,rows,     fun)
+  fun = function(row2) return minkowski(data1,row1,row2) end
+  return keysort(rows or data1.rows, fun) end
+--------- --------- --------- --------- --------- --------- ----
+function corners(data1,rows,row1,     far,row1,row2)
+  far  = (#rows*the.Far)//1
+  row1 = row1 or neighbors(data1, any(rows), rows)[far]
+  row2 = neighbors(data1, row1, rows)[far]
+  return row1,row2, minkowski(data1,row1,row2) end
+
+function half(data1,rows,b4,    a,b,C,d,cos,lo,hi)
+  a,b,C = corners(data1, many(rows, min(the.Half, #rows)),b4)
+  if d2h(data1,b) < d2h(data1,a) then a,b = b,a end
+  d  = function(r1,r2) return minkowski(data1,r1,r2) end
+  cos= function(r) return (d(r,a)^2 + C^2 - d(r,b)^2)/(2*C) end
+  lo,hi = {},{}
+  for n,row1 in pairs(keysort(rows,cos)) do 
+    push(n <=(#rows)//2 and lo or hi, row1) end
+  return a,b,lo,hi end
+
+function tree(data1,sorted)
+  function _tree(data2)
+    node = {here=data1}
+    if #data1.rows > 2* ((#data.rows)^.5) then
+      _,__,lefts,rights = tree.half(data1.rows,sorted)
+      node.lefts        = _tree(clone(data1,lefts))
+      node.rights       = _tree(clone(data1,rights)) end 
+    return node end 
+  return _grow(data) end
 --------- --------- --------- --------- --------- --------- -----
 local eg = {}
 function eg.fails() return false end
@@ -133,8 +171,40 @@ function eg.dist(     t,r1,r2,d)
   for i=1,20 do 
     r1,r2 = any(d.rows),  any(d.rows) 
     push(t, rnd(minkowski(d, r1, r2),2)) end 
-  oo(sorted(t)) 
-  return false end
+  oo(sorted(t)) end
+
+function eg.d2h(     t,r1,r2,d)
+  t,d={},DATA(the.file); 
+  for i=1,20 do 
+    r1  = any(d.rows)
+    push(t, rnd(d2h(d,r1),3)) end
+  oo(sorted(t)) end
+
+function eg.heavens(     t,d,n)
+  t,d={},DATA(the.file)
+  n = (#d.rows) ^.5
+  t = keysort(d.rows, function(r) return d2h(d,r) end) 
+  print("best", o(stats(clone(d, slice(t,1,n)))))
+  print("worst", o(stats(clone(d, slice(t,-n))))) end
+
+function eg.neighbors(     t,d,n)
+  d = DATA(the.file)
+  t = neighbors(d, d.rows[1], d.rows)
+  for i = 1, #t,50 do
+    print(i,o(d.rows[i].cells),
+            rnd(minkowski(d,t[1],t[i]),2)) end end
+
+function eg.neighbors(     t,d,n)
+  d = DATA(the.file)
+  t = neighbors(d, d.rows[1], d.rows)
+  for i = 1, #t,50 do
+    print(i,o(d.rows[i].cells),
+            rnd(minkowski(d,t[1],t[i]),2)) end end
+
+function eg.half(      _,a,b,d)
+  d = DATA(the.file)
+  _,_,a,b = half(d,d.rows) 
+  print(#a, #b) end 
 --------- --------- --------- --------- --------- --------- ----
 local function egs(     tmp,fails)
   the   = l.str.cli(the)

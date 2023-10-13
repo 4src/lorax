@@ -44,8 +44,8 @@ function sort.gt(x)
 
 function sort.keysort(t,fun,      decorated,sorted,undecorated)
   decorated   = lst.map(t, function(z) return {x=z, y=fun(z)} end)
-  sorted      = sort.sorted(decorated, sort.lt"y")
-  undecorated = lst.map(sorted, function(z) return z.x  end)
+  table.sort(decorated, sort.lt"y")
+  undecorated = lst.map(decorated, function(z) return z.x  end)
   return undecorated end
 --------- --------- --------- --------- --------- --------- -----
 local p=lst.per
