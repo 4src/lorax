@@ -13,19 +13,19 @@ for x in gawk lua5.3 ispell; do
   fi
 done
 
-h() {  ## ,h              ;  show help
+h() {  ##  h              ;  show help
   printf "\nACTIONS:\n"
   gawk 'BEGIN        {FS="[(][)][:space:]*[^#]+##[:space:]*"}
-        /^,/ && /##/ {printf(" %s\n",$2) }' $H/etc/h ; }
+        /^[a-z]/ && /##/ {printf(" %s\n",$2) }' $H/etc/h ; }
 
-gp() {  ## gp             ;  commit all, push to github 
+gp() {  ## gp              ;  commit all, push to github 
    git commit -am saving; git push; git status; }
 
-lu() {  ## lu file       ;  run lua. 
+lu() {  ## lu file         ;  run lua. 
    f=$1; shift
    lua $f.lua $*; }
 
-snips() { ## snips file.md  ;  insert snips from code into markdown
+snips() { ## snips file.md   ;  insert snips from code into markdown
   if  [[ -f "$1" ]]
   then 
     gawk 'function trim(s) {sub(/^[ \t\n]*/,"",s); sub(/[ \t\n]*$/,"",s); return s}
@@ -46,10 +46,10 @@ snips() { ## snips file.md  ;  insert snips from code into markdown
     echo "missing $1.md or gawk"
   fi ; }
 
-spell() { ## spell file.md  ;  spell check file
+spell() { ## spell file.md   ;  spell check file
   ispell -x $1 ; }
   
-tests() { ## ,tests          ;  run tests, update README badge
+tests() { ## tests           ;  run tests, update README badge
   s='1c![](https://img.shields.io/badge/tests-failing-red)'
   cd $H/src
   if lua sandbox.lua -g all ; then
