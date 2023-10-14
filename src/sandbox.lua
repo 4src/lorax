@@ -8,7 +8,7 @@ function merges(data1,row1,row2,     t)
 	return ROW(t, row1.n + row2.n) end
 
 function merge(col1,row1,row2,     a,b,N)
-	a,b,N = row1.cells[col.at],row2.cells[col.at], row1.n + row2.n
+	a,b,N = row1.cells[col1.at],row2.cells[col1.at], row1.n + row2.n
 	if a=="?" and b=="?" then return "?" end
 	if a=="?"            then return b end
 	if b=="?"            then return a end
@@ -23,7 +23,7 @@ function col(col1,x)
 		col1.n = col1.n + 1
 		if col1.symp then
 			local tmp =  1 + (col1.has[x] or 0)
-			if tmp > col.most then col.most, col.mode = tmp, x end
+			if tmp > col1.most then col1.most, col1.mode = tmp, x end
 			col1.has[x] = tmp
 		else
 			local d = x - col1.mu

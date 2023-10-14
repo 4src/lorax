@@ -34,6 +34,16 @@ function lst.slice(t, nGo, nStop, nInc,       u)
   for i=(nGo or 1)//1,(nStop or #t)//1,(nInc or 1)//1 do
     u[1+#u]=t[i] end
   return u end
+
+function lst.items(t,     i,tmp)
+  tmp= {}; for k,v in pairs(t) do lst.push(tmp, {key=k,val=v}) end
+  table.sort(tmp, function(a,b) return a.key < b.key end)
+  i=0
+  return function()
+    if i < #tmp then
+      i = i + 1
+      return tmp[i].key, tmp[i].val end end end
+
 --------- --------- --------- --------- --------- --------- -----
 function sort.sorted(t,fun) table.sort(t,fun); return t end
 
@@ -63,7 +73,7 @@ function mathx.mode(xs)
   for k1,v1 in pairs(xs) do if v1>v then k,v=k1,v1 end end
   return k end
 
-function mathx.rnd(x,  digits,    mult)
+function mathx.show(x,  digits,    mult)
   if type(x) ~= "number"   then return tostring(x) end
   if type(x) == "function" then return "()" end
   if math.floor(x) == x    then return x end
@@ -126,7 +136,7 @@ function str.oo(x) print(str.o(x)); return x end
 
 function str.o(x,     t,x1)
   if type(x) == "function" then return "()" end
-  if type(x) == "number"   then return tostring(x) end --tostring(mathx.rnd(x)) end 
+  if type(x) == "number"   then return tostring(x) end
   if type(x) ~= "table"    then return tostring(x) end
   t = lst.kap(x, 
         function(k,v,     x1) 
