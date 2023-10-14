@@ -1,5 +1,5 @@
 local l    = require"lib"
-local the  = {file="data/auto93.csv",p=2, Far=.95, 
+local the  = {file="../data/auto93.csv",p=2, Far=.95, 
               seed=937162211, go="all", Half=256}
 
 local push,csv      = l.lst.push, l.str.csv
@@ -7,10 +7,10 @@ local m,o,oo,sorted = l.mathx, l.str.o, l.str.oo,l.sort.sorted
 local keysort,lt    = l.sort.keysort,l.sort.lt
 local rnd,any,many  = m.rnd, l.rand.any, l.rand.many
 local kap,slice     = l.lst.kap,l.lst.slice
-local min      = math.min
+local min           = math.min
 
 local aha,at,clone,cols,col,corners,data,d2h
-local div,half,mid,minkowski,neighbors,norm,ok,stats
+local div,half,mid,minkowski,neighbors,norm,ok,stats,tree
 
 local COLS,COL,DATA,NUM,ROW,SYM
 --------- --------- --------- --------- --------- --------- -----
@@ -54,12 +54,11 @@ function norm(col1,x,      t)
   else t = ok(col1)._has
        return (x - t[1])/(t[#t] - t[1] + 1E-30) end end
 --------- --------- --------- --------- --------- --------- -----
-function COLS(t,     all,x,y,col1)
-  all,x,y = {},{},{} 
+function COLS(t)
+  local all,x,y,ignore,also = {},{},{},{},nil
   for n,s in pairs(t) do
-    col1 = push(all, COL(n,s))
-    if not s:find"X$" then
-      push(s:find"[!+-]$" and y or x, col1) end end
+    also = s:find"X$" and ignore or (s:find"[!+-]$" and y or x)
+		push(also, push(all, COL(n,s))) end
   return {ako="COLS", all=all, x=x, y=y, names=t} end
 
 function cols(cols1,row1,     x)
@@ -118,7 +117,7 @@ function neighbors(data1,row1,rows,     fun)
   fun = function(row2) return minkowski(data1,row1,row2) end
   return keysort(rows or data1.rows, fun) end
 --------- --------- --------- --------- --------- --------- ----
-function corners(data1,rows,sortp,a,  far,row1,row2)
+function corners(data1,rows,sortp,a,  b,far,row1,row2)
   far = (#rows*the.Far)//1
   a   = a or neighbors(data1, any(rows), rows)[far]
   b   = neighbors(data1, a, rows)[far]
@@ -229,10 +228,11 @@ local function main(     tmp,fails)
   for _,one in pairs(sorted(tmp, lt"key")) do
     if the.go==one.key or the.go=="all" then
       l.rand.seed = the.seed
+      print("--",one.key)
       if one.fun()==false then
         fails = fails + 1
         print("❌ FAIL : ".. one.key) end end end
-  l.rogues()
+  --l.rogues()
   os.exit(fails - 1) end
 
 if not  pcall(debug.getlocal,4,1)  then main() end
