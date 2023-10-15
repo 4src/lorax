@@ -4,7 +4,8 @@ local cat,make,makes,csv
 function ROW(t,n)   return {cells=t, n=n or 1} end
 
 function merges(data1,row1,row2,     t)
-	t={}; for _,col1 in pairs(data1.cols.all) do t[col1.at] = merge(col1,row1,row2) end
+	t={}; for _,col1 in pairs(data1.cols.all) do
+		    t[col1.at] = merge(col1,row1,row2) end
 	return ROW(t, row1.n + row2.n) end
 
 function merge(col1,row1,row2,     a,b,N)
@@ -18,26 +19,31 @@ function NUM(n,s) return {at=n, txt=s, n=0, mu=0, m2=0, sd=0, lo=1E30, hi=-1E30}
 function SYM(n,s) return {at=n, txt=s, has={}, mode=nil, most=0, symp=true } end
 function COL(n,s) return (s:find"^[A-Z]*" and NUM or SYM)(n,s) end
 
-function col(col1,x)
+function col(col1,x,      _num,_sym)
+  function _sym(     tmp)
+    tmp =  1 + (col1.has[x] or 0)
+    if tmp > col1.most then col1.most, col1.mode = tmp, x end
+    col1.has[x] = tmp end
+  function _num(      d)
+    d       = x - col1.mu
+    col1.mu = col1.mu + d/col1.n
+    col1.m2 = col1.m2 + d*(x - col1.mu)
+    if x < col1.lo then col1.lo = x end
+    if x > col1.hi then col1.hi = x end
+    if col1.n > 1  then col1.sd = (col1.m2/(col1.n - 1))^.5 end end
 	if x ~= "?" then
-		col1.n = col1.n + 1
-		if col1.symp then
-			local tmp =  1 + (col1.has[x] or 0)
-			if tmp > col1.most then col1.most, col1.mode = tmp, x end
-			col1.has[x] = tmp
-		else
-			local d = x - col1.mu
-			col1.mu = col1.mu + d/col1.n
-			col1.m2 = col1.m2 + d*(x - col1.mu)
-			if x < col1.lo then col1.lo = x end
-			if x > col1.hi then col1.hi = x end
-			if col1.n > 1 then col1.sd = (col1.m2/(col1.n - 1))^.5 end end end end
+	  col1.n = col1.n + 1
+		return col1.symp and _sym() or _num() end end
 
-function mid(col1) return col1.symp and col1.mode     or col1.mu end
-function div(col1) return col1.symp and ent(col1.has) or col1.sd end
+function mid(col1) 
+  return col1.symp and col1.mode     or col1.mu end
+
+function div(col1) 
+  return col1.symp and ent(col1.has) or col1.sd end
 
 function norm(col1,x)
-	return x=="?" and x or (x - col1.lo) / (col1.hi - col1.lo + 1E-30) end
+	if x=="?" then return x end
+  return (x - col1.lo) / (col1.hi - col1.lo + 1E-30) end
 
 function dist(col1, x,y)
 	if x=="?" and y=="?" then return 1 end
