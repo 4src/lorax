@@ -9,7 +9,7 @@ local xshow,any,many  = m.xshow, l.rand.any, l.rand.many
 local kap,slice     = l.lst.kap,l.lst.slice
 local min           = math.min
 
-local aha,at,clone,cols,col,corners,data,d2h,tree
+local aha,at,clone,cols,col,corners,data,d2h,tree,tshow,walk
 local div,half,mid,minkowski,neighbors,norm,ok,stats,branch
 
 local COLS,COL,DATA,NUM,ROW,SYM
@@ -118,10 +118,11 @@ function d2h(data1,row1,       n,d)
     d = d + (col1.heaven - norm(col1, at(row1,col1)))^2  end
   return (d/n) ^ (1/the.p) end
 
-  function corners(data1,rows,sortp,a,  b,far,row1,row2)
+function corners(data1,rows,sortp,a,  b,far,row1,row2)
   far = (#rows*the.Far)//1 
   a   = a or neighbors(data1, any(rows), rows)[far]
   b   = neighbors(data1, a, rows)[far] 
+  if sortp and d2h(data1,b) < d2h(data1,a) then a,b=b,a end
   return a, b, minkowski(data1,a,b) end
 
 function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
@@ -132,7 +133,7 @@ function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
   for n,row1 in pairs(keysort(rows,cos)) do 
     push(n <=(#rows)//2 and as or bs, row1) end
   return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
-
+--------- --------- --------- --------- --------- --------- ----
 function tree(data1,sortp,      _tree)
   function _tree(data2,above,     lefts,rights,node)
     node = {here=data2}
@@ -144,23 +145,6 @@ function tree(data1,sortp,      _tree)
     return node end
   return _tree(data1) end
 
-function walk(node,fun,lvl)
-  if node then
-    lvl = lvl and lvl + 1 or 0
-    fun(node, lvl, not (node.lefts or node.rights))
-    walk(node.lefts, fun,lvl)
-    walk(node.rights,fun,lvl) end end 
-
-function tshow(node1,     _show,lvl1)
-  lvl1=0
-  function _show(node2,lvl,leafp,     post)
-    post = leafp and o(stats(node2.here)) or ""
-    lvl  = lvl1
-    print(string.format("%s %s", ("|.. "):rep(lvl),post)) end
-  walk(node1, _show)
-  print(string.format("%s %s", (".   "):rep(lvl1), 
-                      o(stats(node1.here)))) end
-
 function branch(data1, sortp,      _,rest,_branch)    
   rest = {}
   function _branch(data2,  above,    left,lefts,rights)
@@ -171,6 +155,22 @@ function branch(data1, sortp,      _,rest,_branch)
     else
       return data2.rows, rest end end
   return _branch(data1) end
+--------- --------- --------- --------- --------- --------- ----    
+function walk(node, fun, depth)
+  if node then
+    depth = depth or 0
+    fun(node, depth, not (node.lefts or node.rights))
+    walk(node.lefts,  fun, depth+1)
+    walk(node.rights, fun, depth+1) end end
+
+function tshow(node1,     _show,depth1)
+  depth1 = 0
+  function _show(node2,depth,leafp,     post)
+    post = leafp and o(stats(node2.here)) or ""
+    depth1  = depth
+    print(('|.. '):rep(depth), post) end
+  walk(node1, _show); print""
+  print( ("    "):rep(depth1), o(stats(node1.here))) end
 --------- --------- --------- --------- --------- --------- -----
 local eg = {}
 function eg.fails() return false end
@@ -250,16 +250,18 @@ function eg.half(      _,d,as,bs)
   as,bs,_,_,_,_  = half(d,d.rows) 
   print(#as, #bs) end 
 
-function eg.branch(      d, t,u)
+function eg.branch(      d,t,u,cost)
   d = DATA(the.file)
   t,u,_ = branch(d,true) 
   print("best",o(stats(clone(d,t))))
-  print("rest",o(stats(clone(d,u)))) end
+  print("rest",o(stats(clone(d,u)))) 
+  cost=0; for _,row in pairs(d.rows) do cost=cost+row.cost end
+  print(cost) end
 
 function eg.tree(      d)
   d = DATA(the.file)
-  tshow( tree(d,true) )
-end
+  tshow(tree(d,true))
+ end
 --------- --------- --------- --------- --------- --------- ----
 local function main(     fails)
   the   = l.str.cli(the)
