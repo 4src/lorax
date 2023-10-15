@@ -73,7 +73,7 @@ function mathx.mode(xs)
   for k1,v1 in pairs(xs) do if v1>v then k,v=k1,v1 end end
   return k end
 
-function mathx.show(x,  digits,    mult)
+function mathx.xshow(x,  digits,    mult)
   if type(x) ~= "number"   then return tostring(x) end
   if type(x) == "function" then return "()" end
   if math.floor(x) == x    then return x end

@@ -5,11 +5,11 @@ local the  = {file="../data/auto93.csv",p=2, Far=.95,
 local push,csv      = l.lst.push, l.str.csv
 local m,o,oo,sorted = l.mathx, l.str.o, l.str.oo,l.sort.sorted
 local keysort,lt    = l.sort.keysort,l.sort.lt
-local show,any,many  = m.show, l.rand.any, l.rand.many
+local xshow,any,many  = m.xshow, l.rand.any, l.rand.many
 local kap,slice     = l.lst.kap,l.lst.slice
 local min           = math.min
 
-local aha,at,clone,cols,col,corners,data,d2h
+local aha,at,clone,cols,col,corners,data,d2h,tree
 local div,half,mid,minkowski,neighbors,norm,ok,stats,branch
 
 local COLS,COL,DATA,NUM,ROW,SYM
@@ -87,7 +87,7 @@ function clone(data1,rows,    data2)
 function stats(data1,  fun,cols1,nDigits,    t)
   t = {N = #data1.rows}
   for _,col1 in pairs(cols1 or data1.cols.y) do
-    t[col1.txt] = show((fun or mid)(col1), nDigits) end
+    t[col1.txt] = xshow((fun or mid)(col1), nDigits) end
   return t end
 --------- --------- --------- --------- --------- --------- ----
 function aha(col1, x,y)
@@ -119,11 +119,9 @@ function d2h(data1,row1,       n,d)
   return (d/n) ^ (1/the.p) end
 
   function corners(data1,rows,sortp,a,  b,far,row1,row2)
-  far = (#rows*the.Far)//1
-  print(#rows, far)
+  far = (#rows*the.Far)//1 
   a   = a or neighbors(data1, any(rows), rows)[far]
-  b   = neighbors(data1, a, rows)[far]
-  print("a",d2h(data1,a),"b", d2h(data1,b)) 
+  b   = neighbors(data1, a, rows)[far] 
   return a, b, minkowski(data1,a,b) end
 
 function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
@@ -133,14 +131,41 @@ function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
   as,bs= {},{}
   for n,row1 in pairs(keysort(rows,cos)) do 
     push(n <=(#rows)//2 and as or bs, row1) end
-  return as,bs,a,b,C,minkowski(data1, a,bs[1])  end
+  return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
+
+function tree(data1,sortp,      _tree)
+  function _tree(data2,above,     lefts,rights,node)
+    node = {here=data2}
+    if #data2.rows > 2*(#data1.rows)^.5 then
+      lefts, rights, node.left, node.right, node.C, node.cut =
+                            half(data1,data2.rows,sortp,above)
+      node.lefts  = _tree(clone(data1, lefts),  node.left)
+      node.rights = _tree(clone(data1, rights), node.right) end
+    return node end
+  return _tree(data1) end
+
+function walk(node,fun,lvl)
+  if node then
+    lvl = lvl and lvl + 1 or 0
+    fun(node, lvl, not (node.lefts or node.rights))
+    walk(node.lefts, fun,lvl)
+    walk(node.rights,fun,lvl) end end 
+
+function tshow(node1,     _show,lvl1)
+  lvl1=0
+  function _show(node2,lvl,leafp,     post)
+    post = leafp and o(stats(node2.here)) or ""
+    lvl  = lvl1
+    print(string.format("%s %s", ("|.. "):rep(lvl),post)) end
+  walk(node1, _show)
+  print(string.format("%s %s", (".   "):rep(lvl1), 
+                      o(stats(node1.here)))) end
 
 function branch(data1, sortp,      _,rest,_branch)    
   rest = {}
   function _branch(data2,  above,    left,lefts,rights)
-    if #(data2.rows) > 2* (#(data1.rows))^.5 then
-      lefts,rights,left,_,_,_ =
-                           half(data1, data2.rows, sortp, above)
+    if #data2.rows > 2*(#data1.rows)^.5 then
+      lefts,rights,left = half(data1, data2.rows, sortp, above)
       for _,row1 in pairs(rights) do push(rest,row1) end
       return _branch(clone(data1,lefts),left)
     else
@@ -188,14 +213,14 @@ function eg.dist(     t,r1,r2,d)
   t,d={},DATA(the.file); 
   for i=1,20 do 
     r1,r2 = any(d.rows),  any(d.rows) 
-    push(t, show(minkowski(d, r1, r2),2)) end 
+    push(t, xshow(minkowski(d, r1, r2),2)) end 
   oo(sorted(t)) end
 
 function eg.heaven(     t,r1,r2,d)
   t,d={},DATA(the.file); 
   for i=1,20 do 
     r1  = any(d.rows)
-    push(t, show(d2h(d,r1),3)) end
+    push(t, xshow(d2h(d,r1),3)) end
   oo(sorted(t)) end
 
 function eg.heavens(     t,d,n)
@@ -210,7 +235,7 @@ function eg.around(     t,d,n)
   d = DATA(the.file)
   t = neighbors(d, d.rows[1], d.rows)
   for i = 1, #t,50 do
-    print(i,show(minkowski(d,t[1],t[i]),2),
+    print(i,xshow(minkowski(d,t[1],t[i]),2),
             o(d.rows[i].cells)) end end
 
 function eg.neighbors(     t,d,n)
@@ -218,19 +243,23 @@ function eg.neighbors(     t,d,n)
   t = neighbors(d, d.rows[1], d.rows)
   for i = 1, #t,50 do
     print(i,o(d.rows[i].cells),
-            show(minkowski(d,t[1],t[i]),2)) end end
+            xshow(minkowski(d,t[1],t[i]),2)) end end
 
 function eg.half(      _,d,as,bs)
   d = DATA(the.file)
   as,bs,_,_,_,_  = half(d,d.rows) 
   print(#as, #bs) end 
 
-function eg.branch(      d,as,bs,t,u)
-    d = DATA(the.file)
-    t,u,_ = branch(d,true) 
-    print("best",o(stats(clone(d,t))))
-    print("rest",o(stats(clone(d,l.lst.slice(u,-30)))))
-     end
+function eg.branch(      d, t,u)
+  d = DATA(the.file)
+  t,u,_ = branch(d,true) 
+  print("best",o(stats(clone(d,t))))
+  print("rest",o(stats(clone(d,u)))) end
+
+function eg.tree(      d)
+  d = DATA(the.file)
+  tshow( tree(d,true) )
+end
 --------- --------- --------- --------- --------- --------- ----
 local function main(     fails)
   the   = l.str.cli(the)
@@ -245,6 +274,4 @@ local function main(     fails)
   l.rogues()
   os.exit(fails - 1) end
 
-if not  pcall(debug.getlocal,4,1)  then main() end
-
- 
+if not pcall(debug.getlocal,4,1)  then main() end
