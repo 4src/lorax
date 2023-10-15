@@ -1,7 +1,7 @@
 #!/usr/bin/env bash 
 unameOut="$(uname -s)"
 case "${unameOut}" in
-    Linux*)     machine=Linux;;
+    Linux)     machine=Linux;;
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
@@ -56,6 +56,24 @@ tests() { ## tests           ;  run tests, update README badge
     s='1c![](https://img.shields.io/badge/tests-passing-green)'
   fi
   sed -i $s $H/README.md; }
+
+pdf() {
+	mkdir -p ~/tmp
+	echo "pdf-ing $1 ... "
+	a2ps                 \
+		-BR                 \
+		--chars-per-line 105  \
+		--file-align=fill      \
+		--line-numbers=1        \
+		--borders=no             \
+		--pro=color               \
+		--pretty-print="$H/etc/lua.ssh" \
+		--columns  2                 \
+		-M letter                     \
+	  -o	 ~/tmp/$1.ps $<
+	ps2pdf ~/tmp/$1.ps ~/tmp/$1.pdf; rm ~/tmp/$1.ps
+	open ~/tmp/$1.pdf
+}
 
 _hello() {
   tput bold; tput setaf 6; cat <<'EOF'
