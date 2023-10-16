@@ -11,7 +11,7 @@ function ROW(t) return {cells=t, cost=0} end
 function DATA(src,    new)
   new = {rows={}, cols=nil}
   if type(src)=="string"
-  then for _,t   in csv(the.data)    do data(new, ROW(t))  end
+  then for _,t   in csv(the.data)    do oo(t); data(new, ROW(t))  end
   else for _,row in pairs(src or {}) do data(new, row) end end
   return new end
 
@@ -20,24 +20,26 @@ function data(data1,row1)
   then cols(data1.cols, push(data1.rows, row1).cells)
   else data1.cols = COLS(row1.cells) end end
 
-function COLS(t,      x,y,all,num,also)
-  x,y,num,all,_ = {},{},{},{},{}
+function COLS(t)
+  oo(t)
+  local x,y,num,all,_ = {},{},{},{},{}
   for n,s in pairs(t) do
     all[n]  = {}
     num[n]  = s:find"^[A-Z]"
     also    = s:find"X$" and _ or (s:find"[!+-]$" and y or x)
     also[n] = all[n] end 
-  return {x=x, y=y, all=all,  names=t} end
+  return {x=x, y=y, all=all,  num=num, names=t} end
 
 function cols(cols1, t)
-  for n,xy in pairs{cols1.x, cols1.y} do
+  for _,xy in pairs{cols1.x, cols1.y} do
     for n,col1 in pairs(xy) do
-    if t[n] ~="?" then 
-      if   cols1.num[n] 
-      then push(col1,x) 
-      else col1[x] = 1 + (col1[x] or 0) end end end end end
+      x=t[n]
+      if x ~="?" then
+        if   cols1.num[n] 
+        then push(col1,x) 
+        else col1[x] = 1 + (col1[x] or 0) end end end end end
 
-function make(s)
+function make(s,    sym)
   function sym(s) return s=="true" or (s~="false" and s) end
   return math.tointeger(s) or tonumber(s) or sym(s:match'^%s*(.*%S)' or '') end
 
@@ -47,8 +49,7 @@ function csv(sFile,     src)
     s = io.read()
     if not s then io.close(src) else
       t={}; for x in s:gmatch("([^,]+)") do t[1+#t] = make(x) end
-      print(#t)
-      if #t > 0 then return t end end end end
+      return t end end end  
 
 -- function mid(col1) 
 --   return col1.symp and col1.mode     or col1.mu end
@@ -74,7 +75,9 @@ function o(t,          u)
   return "{"..table.concat(#t==0 and sort(u) or u," ").."}" end
 --------- --------- --------- --------- --------- --------- -----
 local eg={}
-function eg.data() for t in csv(the.data) do print(#t) end end
+function eg.csv() for t in csv(the.data) do oo(t) end end
+
+function eg.data()  DATA(the.data)  end
 
 eg.data()
 for k,v in pairs(_ENV) do if not b4[k] then print("#W ?",k,type(v)) end end 
