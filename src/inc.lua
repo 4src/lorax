@@ -1,11 +1,30 @@
-local b4={}; for k,v in pairs(_ENV) do b4[k]=k end
-local aha,any,clone,col,corners,csv,d2h,div,ent,fmt,half,keysort,make
-local main,makes,median,mid,minkowski,mode,neighbors,norm,o,oo,ooo
-local per,push,rand,rint,run,rseed,sort,stats,stdev,y
+local l=require"lib"
+local the,help = l.settings[[
 
-local row,data,cols,ROW,DATA,COLS,NUM,SYM,COL
---------- --------- --------- --------- --------- --------- -----
-local the = {data="../data/auto93.csv", p=2, help=true}
+lorax: LORAX Optimizes and Renders AI eXplanations
+(c) Tim Menzies <timm@ieee.org>, BSD-2 license
+     
+USAGE (examples):
+  see eg.lua
+
+OPTIONS:
+  -b --bins   initial number of bins   = 16
+  -C --Cohen  too small                = .35
+  -f --file   csv data file            = ../data/auto93.csv
+  -F --Far    how far to look          = .95
+  -h --help   show help                = false
+  -H --Half   where to find for far    = 256
+  -m --min    min size                 = .5
+  -p --p      distance coefficient     = 2
+  -r --reuse  do npt reuse parent node = true
+  -s --seed   random number seed       = 937162211]]
+
+local aha,any,csv=l.aha,l.any,l.csv
+local ent,fmt,,keysort,make  = l.ent,l.fmt,l.keysort,l.make
+local main,median,mode       = l.main,l.median,l.mode
+local o,oo,ooo               = l.o,l.oo,l.ooo
+local per,push,rand,rint     = l.per,l.push,l.rand,l.rint
+local rseed,sort,stats,stdev = l.rseed,l.sort,l.stats,l.stdev
 --------- --------- --------- --------- --------- --------- -----
 function ROW(t)   return {cells=t, cost=0} end
 
@@ -113,87 +132,5 @@ function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
   for n,row1 in pairs(keysort(rows,cos)) do 
     push(n <=(#rows)//2 and as or bs, row1) end
   return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
---------- --------- --------- --------- --------- --------- -----
-fmt=string.format
-function sort(t,fun) table.sort(t,fun); return t end
 
-function per(t,p) return t[p*#t//1] end
-
-function push(t,x) t[1+#t]=x; return x end
-
-function stdev(t)  return (per(t,.9) - per(t,.1))/2.58 end
-function median(t) return per(t,.5) end
-
-function ent(t,     e,N)
-  N=0; for _,n in pairs(t) do N = N + n end
-  e=0; for _,n in pairs(t) do e = e - n/N*math.log(n/N,2) end
-  return e end
-
-function mode(t,     most,mode)
-  most=0
-  for k,v in pairs(t) do if v > most then mode,most=k,v end end
-  return most end
-
-function oo(t) print(o(t)); return t end
-function o(t,          u)
-  if type(t) ~= "table" then return ooo(t) end
-  u={}; for k,v in pairs(t) do 
-          u[1+#u]= #t==0 and fmt(":%s %s",k,o(v)) or o(v) end
-  return "{"..table.concat(#t==0 and sort(u) or u," ").."}" end
-
-function ooo(x,  digits,    mult)
-  if type(x) ~= "number"   then return tostring(x) end
-  if type(x) == "function" then return "()" end
-  if math.floor(x) == x    then return x end
-  mult = 10^(digits or 0)
-  return math.floor(x * mult + 0.5) / mult end
-
-function make(s,    sym)
-  function sym(s) return s=="true" or (s~="false" and s) end
-  return math.tointeger(s) or tonumber(s) or 
-          sym(s:match'^%s*(.*%S)' or '') end
-
-function makes(s,     t)
-  t={}; for x in s:gmatch("([^,]+)") do 
-          t[1+#t]=make(x) end; return t end
-
-function csv(sFilename,     src)
-  src = io.input(sFilename)
-  return function(     s)
-    s = io.read()
-    if s then return makes(s) else io.close(src) end end end
-
-rseed = 937162211
-function rint(nlo,nhi) return math.floor(0.5 + rand(nlo,nhi))  end
-function rand(nlo,nhi)
-  nlo,nhi = nlo or 0, nhi or 1
-  rseed   = (16807 * rseed) % 2147483647
-  return nlo + (nhi - nlo) * rseed / 2147483647 end
-
-function any(t) return t[rint(1,#t)] end
-
-function keysort(t,fun,      u,w)
-  u={}; for k,v in pairs(t) do push(u, {x=v, y=fun(v)}) end
-  table.sort(u, function(a,b) return a.y < b.y end)
-  w={}; for k,v in pairs(t) do push(w, v.x) end
-  return w end
---------- --------- --------- --------- --------- --------- -----
-local eg={}
-function eg.csv() for t in csv(the.data) do 
-  print(#t, type(t[1]), o(t)) end end
-
-function eg.data(     d)
-  d = DATA(the.data)
-  oo(stats(d)) end 
-
-function main()
-  for _,com in pairs(arg) do
-    if eg[com] then
-      rseed = the.seed
-      print("==> ".. com)
-      if eg[com]()==false then 
-        print("❌ FAIL : "..  com) end end end 
-  for k,v in pairs(_ENV) do 
-    if not b4[k] then print("#W ?",k,type(v)) end end end
-
-main()
+return l.locals() 
