@@ -10,13 +10,15 @@ local kap,slice     = l.lst.kap,l.lst.slice
 local min           = math.min
 
 local aha,at,clone,cols,col,corners,data,d2h,tree,tshow,walk
-local div,half,mid,minkowski,neighbors,norm,ok,stats,branch
+local div,half,mid,minkowski,neighbors,norm,ok,stats,branch,y
 
 local COLS,COL,DATA,NUM,ROW,SYM
 --------- --------- --------- --------- --------- --------- -----
 function ROW(t)   return {ako="ROW", cells=t, heaven=1,cost=0} end
 
 function at(row1,col1) return row1.cells[col1.at] end
+
+function y(row1) row1.cost=1; return row1 end
 --------- --------- --------- --------- --------- --------- -----
 function SYM(n,s) return {ako="SYM", at=n,txt=s,has={}} end
 function NUM(n,s)
@@ -111,7 +113,7 @@ function neighbors(data1,row1,rows,     fun)
   return keysort(rows or data1.rows, fun) end
 --------- --------- --------- --------- --------- --------- ----
 function d2h(data1,row1,       n,d)
-  row1.cost = 1
+  row1 = y(row1)
   n,d = 0,0
   for _,col1 in pairs(data1.cols.y) do
     n = n + 1
