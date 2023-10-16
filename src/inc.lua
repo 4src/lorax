@@ -1,10 +1,9 @@
 local b4={}; for k,v in pairs(_ENV) do b4[k]=k end
-local aha,any,clone,corners,csv,d2h,div,ent,fmt,half,keysort,make
-local makes,median,mid,minkowski,mode,neighbors,norm,o,oo,ooo
+local aha,any,clone,col,corners,csv,d2h,div,ent,fmt,half,keysort,make
+local main,makes,median,mid,minkowski,mode,neighbors,norm,o,oo,ooo
 local per,push,rand,rint,run,rseed,sort,stats,stdev,y
 
-local row,data,cols
-local ROW,DATA,COLS,NUM,SYM,COL
+local row,data,cols,ROW,DATA,COLS,NUM,SYM,COL
 --------- --------- --------- --------- --------- --------- -----
 local the = {data="../data/auto93.csv", p=2, help=true}
 --------- --------- --------- --------- --------- --------- -----
@@ -17,6 +16,11 @@ function NUM(n,s) return {at=n, txt=s, has={}, nump=true,
                           heaven=(s or ""):find"-$" and 0 or 1} end
 
 function COL(n,s) return ((s or ""):find"^[A-Z]" and NUM or SYM)(n,s) end
+
+function col(col1,x)
+  if x ~= "?" then
+    if col1.nump then push(col1.has, x) else
+      col1.has[x] = 1 + (col1.has[x] or 0) end end end
 
 function mid(col1) 
   return col1.nump and median(col1.has) or mode(col1.has) end
@@ -36,13 +40,10 @@ function COLS(t,      also,x,y,num,all,_)
     also[n] = push(all, COL(n,s)) end 
   return {x=x, y=y, all=all, names=t} end
   
-  function cols(cols1,t,     x)
+function cols(cols1,t,     x)
   for _,cols1 in pairs{cols1.x, cols1.y} do
-    for _,col1 in pairs(cols1) do
-      x = t[col1.at]
-      if x ~="?" then
-        if col1.nump then push(col1.has, x) else
-          col1.has[x] = 1 + (col1.has[x] or 0) end end end end end
+    for _,col1 in pairs(cols1) do 
+      col(col1, t[col1.at]) end end end 
 --------- --------- --------- --------- --------- --------- -----
 function DATA(src,    new)
   new = {rows={}, cols=nil}
@@ -185,12 +186,14 @@ function eg.data(     d)
   d = DATA(the.data)
   oo(stats(d)) end 
 
-function run(com)
-  if eg[com] then
-    rseed = the.seed
-    print("==> ".. com)
-    if eg[com]()==false then print("❌ FAIL : "..  com) end end end
+function main()
+  for _,com in pairs(arg) do
+    if eg[com] then
+      rseed = the.seed
+      print("==> ".. com)
+      if eg[com]()==false then 
+        print("❌ FAIL : "..  com) end end end 
+  for k,v in pairs(_ENV) do 
+    if not b4[k] then print("#W ?",k,type(v)) end end end
 
-for _,com in pairs(arg) do run(com) end
-
-for k,v in pairs(_ENV) do if not b4[k] then print("#W ?",k,type(v)) end end
+main()
