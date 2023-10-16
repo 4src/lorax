@@ -12,7 +12,7 @@ function lib.o(t,          u,x)
   if type(t) ~= "table" then return lib.ooo(t) end
   u={}; for k,v in pairs(t) do
           x= lib.o(v)
-          u[1+#u]= #t==0 and lib.fmt(":%s %s",k,x) x end
+          u[1+#u]= #t==0 and lib.fmt(":%s %s",k,x) or x end
   return "{"..table.concat(#t==0 and lib.sort(u) or u," ").."}" end
 
 function lib.oo(t) print(lib.o(t)); return t end

@@ -20,16 +20,20 @@ OPTIONS:
   -s --seed   random number seed       = 937162211]]
 
 local aha,any,csv=l.aha,l.any,l.csv
-local ent,fmt,,keysort,make  = l.ent,l.fmt,l.keysort,l.make
+local ent,fmt,keysort,make  = l.ent,l.fmt,l.keysort,l.make
 local main,median,mode       = l.main,l.median,l.mode
 local o,oo,ooo               = l.o,l.oo,l.ooo
 local per,push,rand,rint     = l.per,l.push,l.rand,l.rint
 local rseed,sort,stats,stdev = l.rseed,l.sort,l.stats,l.stdev
 --------- --------- --------- --------- --------- --------- -----
+local ROW,y
+
 function ROW(t)   return {cells=t, cost=0} end
 
 function y(row1) row1.cost = 1 ; return row1 end
 --------- --------- --------- --------- --------- --------- -----
+local SYM,NUM,COL,col,mid,div,norm
+
 function SYM(n,s) return {at=n, txt=s, has={}} end
 function NUM(n,s) return {at=n, txt=s, has={}, nump=true,
                           heaven=(s or ""):find"-$" and 0 or 1} end
@@ -132,5 +136,7 @@ function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
   for n,row1 in pairs(keysort(rows,cos)) do 
     push(n <=(#rows)//2 and as or bs, row1) end
   return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
+
+for k,v in pairs(l.locals()) do print(k,v) end
 
 return l.locals() 
