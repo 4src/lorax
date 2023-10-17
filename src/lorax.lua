@@ -24,7 +24,7 @@ local function ROW(t)   return {cells=t, cost=0} end
 
 local function y(row1) row1.cost = 1 ; return row1 end
 --------- --------- --------- --------- --------- --------- -----
-local function SYM(n,s) return {at=n, txt=s, has={}} end
+local function SYM(n, s) return {at=n, txt=s, has={}} end
 local function NUM(n,s) return {at=n, txt=s, has={}, nump=true,
                         heaven=(s or ""):find"-$" and 0 or 1} end
 
@@ -35,6 +35,9 @@ local function col(col1,x)
   if x ~= "?" then
     if col1.nump then push(col1.has, x) else
       col1.has[x] = 1 + (col1.has[x] or 0) end end end
+
+local function ok(col1)
+  if col1.nump then table.sort(col1.has) end end
 
 local function mid(col1) 
   return col1.nump and l.median(col1.has) or l.mode(col1.has) end
@@ -69,13 +72,13 @@ local function DATA(src,    new)
   if type(src)=="string"
   then for t     in l.csv(src)       do data(new, ROW(t))  end
   else for _,row in pairs(src or {}) do data(new, row) end end
-  for _,col1 in pairs(new.cols.all) do 
-    if col1.nump then table.sort(col1.has) end end
+  for _,col1 in pairs(new.cols.all) do ok(col1) end 
   return new end
 
 local function clone(data1,rows,    data2)
   data2 = DATA({ROW(data1.cols.names)})
   for _,row1 in pairs(rows or {} ) do data(data2,row1) end
+  for _,col1 in pairs(data2.cols.all) do ok(col1) end 
   return data2 end
 
 local function stats(data1,  fun,cols1,nDigits,    t)
@@ -130,5 +133,6 @@ local function half(data1,rows,sortp,b4)
     push(n <=(#rows)//2 and as or bs, row1) end
   return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
 --------- --------- --------- --------- --------- --------- ----
-return {DATA=DATA, SYM=SYM, NUM=NUM, col=col, mid=mid, div=div,
-        stats=stats, clone=clone, the=the, help=help}
+return {DATA=DATA, SYM=SYM, NUM=NUM,
+        col=col, mid=mid, div=div,stats=stats,
+        clone=clone, the=the, help=help}
