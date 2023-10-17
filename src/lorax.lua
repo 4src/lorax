@@ -4,7 +4,7 @@ local the,help = l.settings[[
 
 lorax: LORAX Optimizes and Renders AI eXplanations
 (c) Tim Menzies <timm@ieee.org>, BSD-2 license
-     
+
 USAGE (examples):
   see eg.lua
 
@@ -28,7 +28,7 @@ local function SYM(n, s) return {at=n, txt=s, has={}} end
 local function NUM(n,s) return {at=n, txt=s, has={}, nump=true,
                         heaven=(s or ""):find"-$" and 0 or 1} end
 
-local function COL(n,s) 
+local function COL(n,s)
   return ((s or ""):find"^[A-Z]" and NUM or SYM)(n,s) end
 
 local function col(col1,x)
@@ -39,10 +39,10 @@ local function col(col1,x)
 local function ok(col1)
   if col1.nump then table.sort(col1.has) end end
 
-local function mid(col1) 
+local function mid(col1)
   return col1.nump and l.median(col1.has) or l.mode(col1.has) end
 
-local function div(col1) 
+local function div(col1)
   return col1.nump and l.stdev(col1.has) or l.ent(col1.has) end
 
 local function norm(col1,x,      t)
@@ -54,13 +54,13 @@ local function COLS(t,      also,x,y,num,all,_)
   x,y,all,_ = {},{},{},{}
   for n,s in pairs(t) do
     also = s:find"X$" and _ or (s:find"[!+-]$" and y or x)
-    also[n] = push(all, COL(n,s)) end 
+    also[n] = push(all, COL(n,s)) end
   return {x=x, y=y, all=all, names=t} end
-  
+
 local function cols(cols1,t,     x)
   for _,cols1 in pairs{cols1.x, cols1.y} do
-    for _,col1 in pairs(cols1) do 
-      col(col1, t[col1.at]) end end end 
+    for _,col1 in pairs(cols1) do
+      col(col1, t[col1.at]) end end end
 --------- --------- --------- --------- --------- --------- -----
 local function data(data1,row1)
   if   data1.cols
@@ -72,13 +72,13 @@ local function DATA(src,    new)
   if type(src)=="string"
   then for t     in l.csv(src)       do data(new, ROW(t))  end
   else for _,row in pairs(src or {}) do data(new, row) end end
-  for _,col1 in pairs(new.cols.all) do ok(col1) end 
+  for _,col1 in pairs(new.cols.all) do ok(col1) end
   return new end
 
 local function clone(data1,rows,    data2)
   data2 = DATA({ROW(data1.cols.names)})
   for _,row1 in pairs(rows or {} ) do data(data2,row1) end
-  for _,col1 in pairs(data2.cols.all) do ok(col1) end 
+  for _,col1 in pairs(data2.cols.all) do ok(col1) end
   return data2 end
 
 local function stats(data1,  fun,cols1,nDigits,    t)
@@ -112,24 +112,24 @@ local function d2h(data1,row1,       n,d)
   n,d = 0,0
   for _,col1 in pairs(data1.cols.y) do
     n = n + 1
-    d = d + (col1.heaven - norm(col1, at(row1,col1)))^2  end
+    d = d + (col1.heaven - norm(col1, row1.cells[col1.at]))) ^2  end
   return (d/n) ^ (1/the.p) end
 
 local function corners(data1,rows,sortp,a)
   local  b,far,row1,row2
-  far = (#rows*the.Far)//1 
+  far = (#rows*the.Far)//1
   a   = a or neighbors(data1, any(rows), rows)[far]
-  b   = neighbors(data1, a, rows)[far] 
+  b   = neighbors(data1, a, rows)[far]
   if sortp and d2h(data1,b) < d2h(data1,a) then a,b=b,a end
   return a, b, minkowski(data1,a,b) end
 
 local function half(data1,rows,sortp,b4)
   local a,b,C,d,cos,as,bs
-  a,b,C= corners(data1,many(rows,min(the.Half,#rows)),sortp,b4) 
+  a,b,C= corners(data1,many(rows,min(the.Half,#rows)),sortp,b4)
   d    = function(r1,r2) return minkowski(data1,r1,r2) end
   cos  = function(r) return (d(r,a)^2+ C^2 - d(r,b)^2)/(2*C) end
   as,bs= {},{}
-  for n,row1 in pairs(keysort(rows,cos)) do 
+  for n,row1 in pairs(keysort(rows,cos)) do
     push(n <=(#rows)//2 and as or bs, row1) end
   return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
 --------- --------- --------- --------- --------- --------- ----
