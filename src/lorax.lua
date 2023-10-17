@@ -59,14 +59,13 @@ local function COLS(t,      also,x,y,num,all,_)
     also[n] = push(all, COL(n,s)) end
   return {x=x, y=y, all=all, names=t} end
 
-local function cols(cols1,xy,t)
-  print(xy)
+local function cols(cols1,xy,t) 
   for _,col1 in pairs(cols1[xy]) do col(col1, t[col1.at]) end end
 --------- --------- --------- --------- --------- --------- -----
 local function ROW(t) return {cells=t, cost=0} end
 
 local function assess(data1,row1) 
-  if row1.cost==0 then cols(data1,"y",row1.cells) end
+  if row1.cost==0 then cols(data1.cols,"y",row1.cells) end
   row1.cost = 1
   return row1 end
 --------- --------- --------- --------- --------- --------- -----
@@ -82,13 +81,13 @@ local function DATA(src,    new)
   else for _,row in pairs(src or {}) do data(new, row) end end 
   return new end
 
-local function clone(data1,rows,    data2)
+local function clone(data1, rows,    data2)
   data2 = DATA({ROW(data1.cols.names)})
   for _,row1 in pairs(rows or {} ) do data(data2,row1) end 
   return data2 end
 
 local function stats(data1,  fun,cols1,nDigits,    t)
-  for _,row1 in pairs(data1.rows) do assess(data1,row1) end
+  for _,row1 in pairs(data1.rows) do print(1); assess(data1,row1) end
   t = {N = #data1.rows}
   for _,col1 in pairs(cols1 or data1.cols.y) do
     t[col1.txt] = ooo((fun or mid)(col1), nDigits) end

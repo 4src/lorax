@@ -48,14 +48,14 @@ function eg.num(     n,md,sd)
 
 function eg.stats(     d)
   d=r.DATA(the.file)
-  print("mid",o(r.stats(d)))
----@diagnostic disable-next-line: undefined-field
+  print("mid",o(r.stats(d))) 
   print("div",o(r.stats(d,r.div,d.cols.y))) end
 
-function eg.clone(      d1,s1,s2,good)
+function eg.clone(      d1,d2,s1,s2,good)
   d1  = r.DATA(the.file)
+  d2  =  r.clone(d1,  d1.rows)
   s1  = r.stats(d1)
-  s2  = r.stats(r.clone(d1,  d1.rows))
+  s2 = r.stats(d2)
   good= true
   for k,v in pairs(s1) do good = good and v == s2[k] end 
   print("original", o(s1))
