@@ -1,15 +1,15 @@
 local l=require"lib"
 local o,oo,ooo,push  = l.o,l.oo,l.ooo,l.push
-local r=require"lorax"
-for k,v in pairs(r) do print(k,v) end
+local r=require"lorax" 
 local the = r.the
 local eg={}
 --------- --------- --------- --------- --------- --------- -----
-local function run(s,fun)
+local function run(s,fun,     failed)
   l.rseed = the.seed
-  print("==> ".. SYM)
-  if fun()==false then 
-    print("❌ FAIL : "..  s) end end
+  print("==> ".. s)
+  failed = fun()==false 
+  if failed then print("❌ FAIL : "..  s) end 
+  return failed end
   
 local function main()
   l.cli(the)
@@ -18,6 +18,14 @@ local function main()
       if eg[com] then run(com,eg[com]) end end end
   l.rogues() end
 --------- --------- --------- --------- --------- --------- -----
+function eg.fails() return false end
+
+function eg.all()
+  fails=0
+  for k,fun in pairs(eg) do
+    if k~="all" then fails = fails + (run(k,fun) and 1 or 0) end end 
+  os.exit(fails) end
+
 function eg.csv(      n)
   n=0; for t in l.csv(the.file) do n = n + #t end 
   return n ==399*8 end  
@@ -26,7 +34,6 @@ function eg.data(     d)
   d = r.DATA(the.file)
   oo(r.stats(d)) end
   
-function eg.fails() return false end
 
 function eg.sym(s)
   s=r.SYM()

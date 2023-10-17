@@ -19,13 +19,7 @@ OPTIONS:
   -p --p      distance coefficient     = 2
   -r --reuse  do npt reuse parent node = true
   -s --seed   random number seed       = 937162211]]
---------- --------- --------- --------- --------- --------- -----
-local function ROW(t) return {cells=t, cost=0} end
 
-local function assess(data1,row1) 
-  if row1.cost==0 then cols(data1,"y",row1.cells) end
-  row1.cost = 1
-  return row1 end
 --------- --------- --------- --------- --------- --------- -----
 local function SYM(n, s) return {at=n, txt=s, has={}} end
 local function NUM(n,s) return {at=n, txt=s, has={}, nump=true,
@@ -65,8 +59,16 @@ local function COLS(t,      also,x,y,num,all,_)
     also[n] = push(all, COL(n,s)) end
   return {x=x, y=y, all=all, names=t} end
 
-local function cols(cols1,xy,t) 
+local function cols(cols1,xy,t)
+  print(xy)
   for _,col1 in pairs(cols1[xy]) do col(col1, t[col1.at]) end end
+--------- --------- --------- --------- --------- --------- -----
+local function ROW(t) return {cells=t, cost=0} end
+
+local function assess(data1,row1) 
+  if row1.cost==0 then cols(data1,"y",row1.cells) end
+  row1.cost = 1
+  return row1 end
 --------- --------- --------- --------- --------- --------- -----
 local function data(data1,row1)
   if   data1.cols
