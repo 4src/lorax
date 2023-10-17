@@ -1,4 +1,5 @@
 local l=require"lib"
+local o,oo,ooo,push  = l.o,l.oo,l.ooo,l.push
 local the,help = l.settings[[
 
 lorax: LORAX Optimizes and Renders AI eXplanations
@@ -18,8 +19,6 @@ OPTIONS:
   -p --p      distance coefficient     = 2
   -r --reuse  do npt reuse parent node = true
   -s --seed   random number seed       = 937162211]]
-
-local o,oo,ooo,push  = l.o,l.oo,l.ooo,l.push
 --------- --------- --------- --------- --------- --------- -----
 local function ROW(t)   return {cells=t, cost=0} end
 
@@ -68,7 +67,7 @@ local function data(data1,row1)
 local function DATA(src,    new)
   new = {rows={}, cols=nil}
   if type(src)=="string"
-  then for t     in l,csv(the.data)  do data(new, ROW(t))  end
+  then for t     in l.csv(src)       do data(new, ROW(t))  end
   else for _,row in pairs(src or {}) do data(new, row) end end
   for _,col1 in pairs(new.cols.all) do 
     if col1.nump then table.sort(col1.has) end end
@@ -113,14 +112,16 @@ local function d2h(data1,row1,       n,d)
     d = d + (col1.heaven - norm(col1, at(row1,col1)))^2  end
   return (d/n) ^ (1/the.p) end
 
-local function corners(data1,rows,sortp,a,  b,far,row1,row2)
+local function corners(data1,rows,sortp,a)
+  local  b,far,row1,row2
   far = (#rows*the.Far)//1 
   a   = a or neighbors(data1, any(rows), rows)[far]
   b   = neighbors(data1, a, rows)[far] 
   if sortp and d2h(data1,b) < d2h(data1,a) then a,b=b,a end
   return a, b, minkowski(data1,a,b) end
 
-local function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
+local function half(data1,rows,sortp,b4)
+  local a,b,C,d,cos,as,bs
   a,b,C= corners(data1,many(rows,min(the.Half,#rows)),sortp,b4) 
   d    = function(r1,r2) return minkowski(data1,r1,r2) end
   cos  = function(r) return (d(r,a)^2+ C^2 - d(r,b)^2)/(2*C) end
@@ -129,4 +130,5 @@ local function half(data1,rows,sortp,b4,    a,b,C,d,cos,as,bs)
     push(n <=(#rows)//2 and as or bs, row1) end
   return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
 --------- --------- --------- --------- --------- --------- ----
-return l.locals()
+return {DATA=DATA, SYM=SYM, NUM=NUM, col=col, mid=mid, div=div,
+        stats=stats, clone=clone, the=the, help=help}
