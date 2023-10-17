@@ -20,12 +20,16 @@ OPTIONS:
   -r --reuse  do npt reuse parent node = true
   -s --seed   random number seed       = 937162211]]
 --------- --------- --------- --------- --------- --------- -----
-local function ROW(t)   return {cells=t, cost=0} end
+local function ROW(t) return {cells=t, cost=0} end
 
-local function y(row1) row1.cost = 1 ; return row1 end
+local function assess(data1,row1) 
+  if row1.cost==0 then cols(data1,"y",row1.cells) end
+  row1.cost = 1
+  return row1 end
 --------- --------- --------- --------- --------- --------- -----
 local function SYM(n, s) return {at=n, txt=s, has={}} end
 local function NUM(n,s) return {at=n, txt=s, has={}, nump=true,
+                        ok=false,lo=1E30, hi=-1E30,
                         heaven=(s or ""):find"-$" and 0 or 1} end
 
 local function COL(n,s)
@@ -33,22 +37,26 @@ local function COL(n,s)
 
 local function col(col1,x)
   if x ~= "?" then
-    if col1.nump then push(col1.has, x) else
-      col1.has[x] = 1 + (col1.has[x] or 0) end end end
+    if col1.nump 
+    then push(col1.has, x); col1.ok=false
+         if x > col1.hi then col1.hi = x end
+         if x < col1.lo then col1.lo = x end
+    else col1.has[x] = 1 + (col1.has[x] or 0) end end end
 
 local function ok(col1)
-  if col1.nump then table.sort(col1.has) end end
+  if   col1.nump and not col1.ok
+  then table.sort(col1.has); col1.ok=true end
+  return col1 end
 
 local function mid(col1)
-  return col1.nump and l.median(col1.has) or l.mode(col1.has) end
+  return col1.nump and l.median(ok(col1).has) or l.mode(col1.has) end
 
 local function div(col1)
-  return col1.nump and l.stdev(col1.has) or l.ent(col1.has) end
+  return col1.nump and l.stdev(ok(col1).has) or l.ent(col1.has) end
 
 local function norm(col1,x,      t)
   if   x=="?" or not col1.nump then return x else
-    t = col1.has
-    return (x - t[1])/(t[#t] - t[1] + 1E-30) end end
+    return (x - col1.lo)/(col1.hi - col1.lo + 1E-30) end end
 --------- --------- --------- --------- --------- --------- -----
 local function COLS(t,      also,x,y,num,all,_)
   x,y,all,_ = {},{},{},{}
@@ -57,31 +65,28 @@ local function COLS(t,      also,x,y,num,all,_)
     also[n] = push(all, COL(n,s)) end
   return {x=x, y=y, all=all, names=t} end
 
-local function cols(cols1,t,     x)
-  for _,cols1 in pairs{cols1.x, cols1.y} do
-    for _,col1 in pairs(cols1) do
-      col(col1, t[col1.at]) end end end
+local function cols(cols1,xy,t) 
+  for _,col1 in pairs(cols1[xy]) do col(col1, t[col1.at]) end end
 --------- --------- --------- --------- --------- --------- -----
 local function data(data1,row1)
   if   data1.cols
-  then cols(data1.cols, push(data1.rows, row1).cells)
+  then cols(data1.cols, "x", push(data1.rows, row1).cells)
   else data1.cols = COLS(row1.cells) end end
 
 local function DATA(src,    new)
   new = {rows={}, cols=nil}
   if type(src)=="string"
   then for t     in l.csv(src)       do data(new, ROW(t))  end
-  else for _,row in pairs(src or {}) do data(new, row) end end
-  for _,col1 in pairs(new.cols.all) do ok(col1) end
+  else for _,row in pairs(src or {}) do data(new, row) end end 
   return new end
 
 local function clone(data1,rows,    data2)
   data2 = DATA({ROW(data1.cols.names)})
-  for _,row1 in pairs(rows or {} ) do data(data2,row1) end
-  for _,col1 in pairs(data2.cols.all) do ok(col1) end
+  for _,row1 in pairs(rows or {} ) do data(data2,row1) end 
   return data2 end
 
 local function stats(data1,  fun,cols1,nDigits,    t)
+  for _,row1 in pairs(data1.rows) do assess(data1,row1) end
   t = {N = #data1.rows}
   for _,col1 in pairs(cols1 or data1.cols.y) do
     t[col1.txt] = ooo((fun or mid)(col1), nDigits) end
@@ -107,25 +112,30 @@ local function neighbors(data1,row1,rows,     fun)
   fun = function(row2) return minkowski(data1,row1,row2) end
   return l.keysort(rows or data1.rows, fun) end
 --------- --------- --------- --------- --------- --------- ----
+local function better(data1, row1,row2)
+  row1,row2 = assess(row1), assess(row2)
+  return d2h(data1,row1) < d2h(data1,row2) end
+
 local function d2h(data1,row1,       n,d)
-  row1 = y(row1)
+  row1 = assess(row1)
   n,d = 0,0
   for _,col1 in pairs(data1.cols.y) do
     n = n + 1
-    d = d + (col1.heaven - norm(col1, row1.cells[col1.at]))) ^2  end
+    d = d + (col1.heaven - norm(col1, row1.cells[col1.at])) ^2  end
   return (d/n) ^ (1/the.p) end
 
 local function corners(data1,rows,sortp,a)
   local  b,far,row1,row2
   far = (#rows*the.Far)//1
-  a   = a or neighbors(data1, any(rows), rows)[far]
+  a   = a or neighbors(data1, l.any(rows), rows)[far]
   b   = neighbors(data1, a, rows)[far]
   if sortp and d2h(data1,b) < d2h(data1,a) then a,b=b,a end
   return a, b, minkowski(data1,a,b) end
 
 local function half(data1,rows,sortp,b4)
   local a,b,C,d,cos,as,bs
-  a,b,C= corners(data1,many(rows,min(the.Half,#rows)),sortp,b4)
+  a,b,C= corners(data1,
+                 l.many(rows,math.min(the.Half,#rows)),sortp,b4)
   d    = function(r1,r2) return minkowski(data1,r1,r2) end
   cos  = function(r) return (d(r,a)^2+ C^2 - d(r,b)^2)/(2*C) end
   as,bs= {},{}
@@ -133,7 +143,7 @@ local function half(data1,rows,sortp,b4)
     push(n <=(#rows)//2 and as or bs, row1) end
   return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
 --------- --------- --------- --------- --------- --------- ----
-return {DATA=DATA, SYM=SYM, NUM=NUM,
-        col=col, mid=mid, div=div,stats=stats,
-        minkowski=minkowski,aha=aha,
-        clone=clone, the=the, help=help}
+return { ROW=ROW, DATA=DATA, SYM=SYM, NUM=NUM,
+         col=col, mid=mid, div=div, norm=norm, stats=stats,
+         minkowski=minkowski,aha=aha,
+         clone=clone, the=the, help=help}

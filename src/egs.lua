@@ -1,19 +1,22 @@
 local l=require"lib"
 local o,oo,ooo,push  = l.o,l.oo,l.ooo,l.push
 local r=require"lorax"
+for k,v in pairs(r) do print(k,v) end
 local the = r.the
 local eg={}
 --------- --------- --------- --------- --------- --------- -----
+local function run(s,fun)
+  l.rseed = the.seed
+  print("==> ".. SYM)
+  if fun()==false then 
+    print("❌ FAIL : "..  s) end end
+  
 local function main()
   l.cli(the)
   if the.help then print(r.help) else
     for _,com in pairs(arg) do
-      if eg[com] then
-        l.rseed = the.seed
-        print("==> ".. com)
-        if eg[com]()==false then 
-          print("❌ FAIL : "..  com) end end end
-    l.rogues() end end
+      if eg[com] then run(com,eg[com]) end end end
+  l.rogues() end
 --------- --------- --------- --------- --------- --------- -----
 function eg.csv(      n)
   n=0; for t in l.csv(the.file) do n = n + #t end 
@@ -39,6 +42,7 @@ function eg.num(     n,md,sd)
 function eg.stats(     d)
   d=r.DATA(the.file)
   print("mid",o(r.stats(d)))
+---@diagnostic disable-next-line: undefined-field
   print("div",o(r.stats(d,r.div,d.cols.y))) end
 
 function eg.clone(      d1,s1,s2,good)
@@ -62,23 +66,24 @@ function eg.dist(     t,r1,r2,d)
 function eg.heaven(     t,r1,r2,d)
   t,d={},DATA(the.file); 
   for i=1,20 do 
-    r1  = any(d.rows)
-    push(t, xshow(d2h(d,r1),3)) end
-  oo(sorted(t)) end
+    r1  = l.any(d.rows)
+    push(t, l.ooo(d2h(d,r1),3)) end
+  oo(l.ooo(t)) end
 
 function eg.heavens(     t,d,n)
   t,d={},DATA(the.file)
   n = (#d.rows) ^.5
+  for _,row1 in pairs(d.rows) do assess(d,row1) end
   t = keysort(d.rows, function(r) return d2h(d,r) end) 
-  print("best", o(stats(clone(d, slice(t,1,n)))))
-  print("worst", o(stats(clone(d, slice(t,-n))))) 
-end
+  print("best", o(stats(clone(d, l.slice(t,1,n)))))
+  print("worst", o(stats(clone(d, l.slice(t,-n))))) end
+
 
 function eg.around(     t,d,n)
   d = DATA(the.file)
   t = neighbors(d, d.rows[1], d.rows)
   for i = 1, #t,50 do
-    print(i,xshow(minkowski(d,t[1],t[i]),2),
+    print(i,l.ooo(minkowski(d,t[1],t[i]),2),
             o(d.rows[i].cells)) end end
 
 function eg.neighbors(     t,d,n)
@@ -86,7 +91,7 @@ function eg.neighbors(     t,d,n)
   t = neighbors(d, d.rows[1], d.rows)
   for i = 1, #t,50 do
     print(i,o(d.rows[i].cells),
-            xshow(minkowski(d,t[1],t[i]),2)) end end
+            l.ooo(minkowski(d,t[1],t[i]),2)) end end
 
 function eg.half(      _,d,as,bs)
   d = DATA(the.file)

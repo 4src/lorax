@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global, undefined-field, undefined-global
 the={data="../data/auto93.csv", p=2}
 local cat,make,makes,csv
 --------- --------- --------- --------- --------- --------- --------- --------- --------- ---------

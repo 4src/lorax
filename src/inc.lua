@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global, undefined-global, undefined-field
 local l=require"lib"
 local the,help = l.settings[[
 

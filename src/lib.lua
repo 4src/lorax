@@ -38,7 +38,7 @@ function lib.cli(t)
       if x=="-"..(k:sub(1,1)) or x=="--"..k then
         v= ((v=="false" and "true") or (v=="true" and "false")
             or arg[n+1]) 
-        t[k] = str.make(v) end end end
+        t[k] = lib.make(v) end end end
   return t end
 --------- --------- --------- --------- --------- --------- -----
 function lib.make(s,    _sym)
@@ -66,6 +66,15 @@ function lib.keysort(t,fun,      u,w)
 --------- --------- --------- --------- --------- --------- -----
 function lib.per(t,p) return t[p*#t//1] end
 function lib.push(t,x) t[1+#t]=x; return x end
+
+function lib.slice(t, nGo, nStop, nInc,       u)
+  if nGo   and nGo   < 0 then nGo  = #t + nGo +1 end
+  if nStop and nStop < 0 then nStop= #t + nStop  end
+  u={}
+  for i=(nGo or 1)//1,(nStop or #t)//1,(nInc or 1)//1 do 
+    u[1+#u]=t[i] end
+  return u end
+
 --------- --------- --------- --------- --------- --------- -----
 function lib.stdev(t) 
   return (lib.per(t,.9) - lib.per(t,.1))/2.58 end
@@ -81,15 +90,6 @@ function lib.mode(t,     most,mode)
   most=0
   for k,v in pairs(t) do if v > most then mode,most=k,v end end
   return most end
---------- --------- --------- --------- --------- --------- -----
-function lib.locals(    t,j,s,x)
-    t,j,s,x = {},1 
-    while true do
-      s, x = debug.getlocal(2, j)
-      if not s then break end
-      if s:sub(1,1) ~= "" then t[s]=x end
-      j = j + 1 end
-    return t end
 --------- --------- --------- --------- --------- --------- -----
 lib.rseed = 937162211
 function lib.rint(nlo,nhi) 

@@ -13,4 +13,9 @@
 
 Explore `N` options after evaluating `log(log(N))` examples.
 
-Find two distant points. Score them _best, rest_.   Prune everything closest to _rest_. Recurse on the remaining.
+1. Find two distant points. 
+2. Score them _best, rest_.  
+3. Prune everything closest to _rest_.
+4. If more than `sqrt(N)` still exists
+   - then go to step1.
+   - else, report  the ranges that most distinguish the pruned from the _best_ rows.
