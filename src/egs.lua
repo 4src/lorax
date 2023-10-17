@@ -52,11 +52,12 @@ function eg.clone(      d1,s1,s2,good)
   return good end
 
 function eg.dist(     t,r1,r2,d)
-  t,d={},DATA(the.file); 
+  t,d={},r.DATA(the.file); 
   for i=1,20 do 
-    r1,r2 = any(d.rows),  any(d.rows) 
-    push(t, xshow(minkowski(d, r1, r2),2)) end 
-  oo(sorted(t)) end
+    r1,r2 = l.any(d.rows),  l.any(d.rows) 
+    print(r.minkowski(d, r1, r2))
+    push(t, ooo(r.minkowski(d, r1, r2),2)) end 
+  oo(l.sort(t)) end
 
 function eg.heaven(     t,r1,r2,d)
   t,d={},DATA(the.file); 

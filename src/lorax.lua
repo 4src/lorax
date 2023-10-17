@@ -135,4 +135,5 @@ local function half(data1,rows,sortp,b4)
 --------- --------- --------- --------- --------- --------- ----
 return {DATA=DATA, SYM=SYM, NUM=NUM,
         col=col, mid=mid, div=div,stats=stats,
+        minkowski=minkowski,aha=aha,
         clone=clone, the=the, help=help}
