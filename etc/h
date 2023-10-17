@@ -6,7 +6,8 @@ case "${unameOut}" in
 esac
 
 for x in gawk lua5.3 ispell; do 
-  if [ "$machine"=="Linux" ]; then
+  if [ "$machine" = "Linux" ]; then
+    echo 111
     command -v $x > /dev/null || sudo apt install $x
   else
     echo "Please ensure $x is installed"
