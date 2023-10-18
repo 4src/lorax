@@ -2,31 +2,30 @@
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux)     machine=Linux;;
-    *)          machine="UNKNOWN:${unameOut}"
+    *)         machine="UNKNOWN:${unameOut}"
 esac
 
 for x in gawk lua5.3 ispell; do 
   if [ "$machine" = "Linux" ]; then
-    echo 111
     command -v $x > /dev/null || sudo apt install $x
   else
-    echo "Please ensure $x is installed"
+    echo "Please ensure $x is installed."
   fi
 done
 
-h() {  ##  h              ;  show help
+,h() {  ## ,h               ;  show help
   printf "\nACTIONS:\n"
   gawk 'BEGIN        {FS="[(][)][:space:]*[^#]+##[:space:]*"}
-        /^[a-z]/ && /##/ {printf(" %s\n",$2) }' $H/etc/h ; }
+        /^,[a-z]/ && /##/ {printf(" %s\n",$2) }' $H/, ; }
 
-gp() {  ## gp              ;  commit all, push to github 
+,gp() {  ## ,gp              ;  commit all, push to github 
    git commit -am saving; git push; git status; }
 
-lu() {  ## lu file         ;  run lua. 
+,lu() {  ## ,lu file         ;  run lua. 
    f=$1; shift
    lua $f.lua $*; }
 
-snips() { ## snips file.md   ;  insert snips from code into markdown
+,snips() { ## ,snips file.md   ;  insert snips from code into markdown
   if  [[ -f "$1" ]]
   then 
     gawk 'function trim(s) {sub(/^[ \t\n]*/,"",s); sub(/[ \t\n]*$/,"",s); return s}
@@ -47,34 +46,16 @@ snips() { ## snips file.md   ;  insert snips from code into markdown
     echo "missing $1.md or gawk"
   fi ; }
 
-spell() { ## spell file.md   ;  spell check file
+,spell() { ## ,spell file.md   ;  spell check file
   ispell -x $1 ; }
   
-tests() { ## tests           ;  run tests, update README badge
+,tests() { ## ,tests           ;  run tests, update README badge
   s='1c![](https://img.shields.io/badge/tests-failing-red)'
   cd $H/src
   if lua sandbox.lua -g all ; then
     s='1c![](https://img.shields.io/badge/tests-passing-green)'
   fi
   sed -i $s $H/README.md; }
-
-# pdf() {
-# 	mkdir -p ~/tmp
-# 	echo "pdf-ing $1 ... "
-# 	a2ps                 \
-# 		-BR                 \
-# 		--chars-per-line 105  \
-# 		--file-align=fill      \
-# 		--line-numbers=1        \
-# 		--borders=no             \
-# 		--pro=color               \
-# 		--pretty-print="$H/etc/lua.ssh" \
-# 		--columns  2                 \
-# 		-M letter                     \
-# 	  -o	 ~/tmp/$1.ps $<
-# 	ps2pdf ~/tmp/$1.ps ~/tmp/$1.pdf; rm ~/tmp/$1.ps
-# 	open ~/tmp/$1.pdf
-# }
 
 _hello() {
   tput bold; tput setaf 6; cat <<'EOF'
@@ -93,5 +74,5 @@ here() { cd $1; basename `pwd`; }
 if  [ -z "$H" ]; then
   _hello
   H=`git rev-parse --show-toplevel`
-  PROMPT_COMMAND='echo -ne "💫 $(git branch 2>/dev/null | grep '^*' | colrm 1 2):";PS1="$(here ..)/$(here .):\!\e[m ▶ "'     
+  PROMPT_COMMAND='echo -ne ",$(git branch 2>/dev/null | grep '^*' | colrm 1 2):";PS1="$(here ..)/$(here .):\!\e[m ▶ "'     
 fi
