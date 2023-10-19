@@ -1,17 +1,16 @@
 #!/usr/bin/env bash 
-unameOut="$(uname -s)"
-case "${unameOut}" in
-    Linux)     machine=Linux;;
-    *)         machine="UNKNOWN:${unameOut}"
-esac
-
-for x in gawk lua5.3 ispell; do 
-  if [ "$machine" = "Linux" ]; then
-    command -v $x > /dev/null || sudo apt install $x
-  else
-    echo "Please ensure $x is installed."
+install() {
+  if   [[ "$OSTYPE" == "darwin"* ]]   ; then brew install $1
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then apt-get install $1
+  elif [[ "$OSTYPE" == "freebsd"* ]]  ; then pkg install $1
+  elif [[ "$OSTYPE" == "cygwin" ]]    ; then echo "how to install $1 on $OSTYPE?"
+  elif [[ "$OSTYPE" == "msys" ]]      ; then echo "how to install $1 on $OSTYPE?"
+  elif [[ "$OSTYPE" == "win32" ]]     ; then echo "how to install $1 on $OSTYPE?"
+  else                                       echo "how to install $1 on $OSTYPE?"
   fi
-done
+}
+for x in gawk lua5.3 ispell; do 
+  (which $x) > /dev/null || install $x; done
 
 ,h() {  ## ,h               ;  show help
   printf "\nACTIONS:\n"
