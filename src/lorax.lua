@@ -1,5 +1,4 @@
 local l=require"lib"
-local o,oo,ooo,push  = l.o,l.oo,l.ooo,l.push
 local the,help = l.settings[[
 
 lorax: LORAX Optimizes and Renders AI eXplanations
@@ -19,129 +18,132 @@ OPTIONS:
   -p --p      distance coefficient     = 2
   -r --reuse  do npt reuse parent node = true
   -s --seed   random number seed       = 937162211]]
---------- --------- --------- --------- --------- --------- -----
-local function SYM(n, s) return {at=n, txt=s, has={}} end
-local function NUM(n,s) return {at=n, txt=s, has={}, nump=true,
-                        ok=false,lo=1E30, hi=-1E30,
-                        heaven=(s or ""):find"-$" and 0 or 1} end
 
+local o,oo,push  = l.o,l.oo,l.push
+local SYM,NUM,DATA=l.obj"SYM",l.obj"NUM",l.obj"DATA"
+local ROW, COLS= l.obj"ROW",l.obj"COLS"
+--------- --------- --------- --------- --------- --------- -----
 local function COL(n,s)
   return ((s or ""):find"^[A-Z]" and NUM or SYM)(n,s) end
 
-local function col(col1,x)
+function SYM:new(n, s) return {at=n, txt=s, has={}} end
+function NUM:new(n,s)  return {at=n, txt=s, has={}, nump=true,
+                        ok=false,lo=1E30, hi=-1E30,
+                        heaven=(s or ""):find"-$" and 0 or 1} end
+
+function SYM:add(x)
+  if x ~= "?" then self.has[x] = 1 + (self.has[x] or 0) end end
+
+function NUM:add(x)
   if x ~= "?" then
-    if col1.nump 
-    then push(col1.has, x); col1.ok=false
-         if x > col1.hi then col1.hi = x end
-         if x < col1.lo then col1.lo = x end
-    else col1.has[x] = 1 + (col1.has[x] or 0) end end end
+    push(self.has, x); self.ok=false
+    if x > self.hi then self.hi = x end
+    if x < self.lo then self.lo = x end end end
 
-local function ok(col1)
-  if   col1.nump and not col1.ok
-  then table.sort(col1.has); col1.ok=true end
-  return col1 end
+function SYM:ok() return self end
+function NUM:ok()
+  if not self.ok then table.sort(self.has); self.ok=true end
+  return self end
 
-local function mid(col1,    has)
-  has = ok(col1).has
-  return col1.nump and l.median(has) or l.mode(has) end
+function SYM:mid() return l.mode(self:ok().has)   end
+function NUM:mid() return l.median(self:ok().has) end
 
-local function div(col1,    has)
-  has = ok(col1).has
-  return col1.nump and l.stdev(has) or l.ent(has) end
+function SYM:div() return l.ent(self:ok().has)   end
+function NUM:div() return l.stdev(self:ok().has) end
 
-local function norm(col1,x,      t)
-  if   x=="?" or not col1.nump then return x else
-    return (x - col1.lo)/(col1.hi - col1.lo + 1E-30) end end
+function SYM:norm(x) return x end
+function NUM:norm(x)
+  if x=="?" then return x end
+  return (x - self.lo)/(self.hi - self.lo + 1E-30) end
 --------- --------- --------- --------- --------- --------- -----
-local function COLS(t,      also,x,y,num,all,_)
-  x,y,all,_ = {},{},{},{}
+function COLS:new(t,      u,_)
+  self.x,self.y,self.all,_ = {},{},{},{}
   for n,s in pairs(t) do
-    also = s:find"X$" and _ or (s:find"[!+-]$" and y or x)
-    also[n] = push(all, COL(n,s)) end
-  return {x=x, y=y, all=all, names=t} end
+    u= s:find"X$" and _ or (s:find"[!+-]$" and self.y or self.x)
+    u[n] = push(self.all, COL(n,s)) end end
 
-local function cols(cols1,row1) 
-  for _,xy in pairs{cols1.x, cols1.y} do
-    for _,col1 in pairs(xy) do 
-      col(col1, row1.cells[col1.at]) end end end
+function COLS:add(row) 
+  for _,xy in pairs{self.x, self.y} do
+    for _,col in pairs(xy) do 
+      col:add(row.cells[col.at]) end end end
 --------- --------- --------- --------- --------- --------- -----
-local function ROW(t) return {cells=t, cost=0} end
+function ROW:new(t) return {cells=t, cost=0} end
 
-local function evaluate(row1) row1.cost = 1; return row1 end
+function ROW:evaluate() self.cost = 1; return self end
 --------- --------- --------- --------- --------- --------- -----
-local function data(data1,row1)
-  if   data1.cols
-  then push(data1.rows, row1);
-       cols(data1.cols, row1)
-  else data1.cols = COLS(row1.cells) end end
+function DATA:new(src)
+  self.rows,self.cols ={},nil 
+  if type(src) == "string"
+  then for t     in l.csv(src)       do self:add(ROW(t))  end
+  else for _,row in pairs(src or {}) do self:add(row) end end
+end
 
-local function DATA(src,    new)
-  new = {rows={}, cols=nil}
-  if type(src)=="string"
-  then for t     in l.csv(src)       do data(new, ROW(t))  end
-  else for _,row in pairs(src or {}) do data(new, row) end end 
-  return new end
+function DATA:add(row)
+  if   self.cols
+  then self.cols:add(push(self.rows, row))
+  else self.cols = COLS(row.cells) end end
 
-local function clone(data1, rows,    data2)
-  data2 = DATA({ROW(data1.cols.names)})
-  for _,row1 in pairs(rows or {} ) do  data(data2,row1) end
-  return data2 end
+function DATA:clone(rows,    data)
+  data = DATA({ROW(self.cols.names)})
+  for _,row in pairs(rows or {} ) do  data:add(row) end
+  return data end
 
-local function stats(data1,  fun,cols1,nDigits,    t)
+function DATA:stats(  fun,cols,nDigits,    t,get)
+  function get(col)
+    return getmetatable(col)[fun or "mid"](col) end
   t = {N = #data1.rows}
-  for _,col1 in pairs(cols1 or data1.cols.y) do
-    t[col1.txt] = o((fun or mid)(col1), nDigits) end
+  for _,col in pairs(cols or self.cols.y) do
+    t[col.txt] = o(get(col), nDigits) end
   return t end
 --------- --------- --------- --------- --------- --------- -----
-local function aha(col1, x,y)
-  if     x=="?" and y=="?" then return 1
-  elseif not col1.nump
-  then   return x==y and 0 or 1
-  else   x,y = norm(col1,x), norm(col1,y)
-         if x=="?" then x = y<.5 and 1 or 0 end
-         if y=="?" then y = x<.5 and 1 or 0 end
-         return math.abs(x - y) end end
+function SYM:dist(x,y) 
+  return  x=="?" and y=="?" and 1 or (x==y and 0 or 1) end
 
-local function minkowski(data1,row1,row2,      n,d)
+function NUM:dist(x,y)
+  if x=="?" and y=="?" then return 1  end
+  x,y = self:norm(x), self:norm(y)
+  if x=="?" then x = y<.5 and 1 or 0 end
+  if y=="?" then y = x<.5 and 1 or 0 end 
+  return math.abs(x - y) end 
+
+function DATA:dist(row1,row2,      n,d)
   n,d = 0,0
-  for _,col1 in pairs(data1.cols.y) do
-    n = n + 1
-    d = d + aha(col1,row1.cells[col1.at],row2.cells[col1.at])^the.p end
+  for _,col in pairs(self.cols.y) do
+    n= n +1
+    d= d + 
+      col:dist(row1.cells[col.at],row2.cells[col.at])^the.p end
   return (d/n) ^ (1/the.p) end
 
-local function neighbors(data1,row1,rows,     fun)
-  fun = function(row2) return minkowski(data1,row1,row2) end
-  return l.keysort(rows or data1.rows, fun) end
+function DATA:neighbors(row1,rows,     fun)
+  fun = function(row2) return self:dist(row1,row2) end
+  return l.keysort(rows or self.rows, fun) end
 --------- --------- --------- --------- --------- --------- ----
-local function d2h(data1,row1,       n,d)
-  row1 = evaluate(row1)
+function DATA:d2h(row,       n,d)
+  row = row:evaluate()
   n,d = 0,0
-  for _,col1 in pairs(data1.cols.y) do
-    n = n + 1
-    d = d + (col1.heaven - norm(col1,row1.cells[col1.at]))^2 end
+  for _,col in pairs(self.cols.y) do
+    n= n + 1
+    d= d + (col.heaven - col:norm(row.cells[col.at]))^2 end
   return (d/n) ^ (1/the.p) end
 
-local function corners(data1,rows,sortp,a)
+function DATA:corners(rows,sortp,a)
   local b,far,row1,row2
   far = (#rows*the.Far)//1
-  a   = a or neighbors(data1, l.any(rows), rows)[far]
-  b   = neighbors(data1, a, rows)[far]
-  if sortp and d2h(data1,b) < d2h(data1,a) then a,b=b,a end
-  return a, b, minkowski(data1,a,b) end
+  a   = a or self:neighbors(l.any(rows), rows)[far]
+  b   = self:neighbors(a, rows)[far]
+  if sortp and self:d2h(b) < self:d2h(a) then a,b=b,a end
+  return a, b, self:dist(a,b) end
 
-local function half(data1,rows,sortp,b4)
+function DATA:half(rows,sortp,b4)
   local a,b,C,d,project,as,bs
-  a,b,C= corners(data1,
-                 l.many(rows,math.min(the.Half,#rows)),sortp,b4)
-  d       = function(r1,r2) return minkowski(data1,r1,r2) end
-  project = function(r) return (d(r,a)^2+C^2-d(r,b)^2)/(2*C) end
+  a,b,C= self:corners(
+               l.many(rows,math.min(the.Half,#rows)),sortp,b4)     
+  function project(r)
+    return (self.dist(r,a)^2 + C^2 - self.dist(r,b)^2)/(2*C) end
   as,bs= {},{}
   for n,row1 in pairs(l.keysort(rows,project)) do
     push(n <=(#rows)//2 and as or bs, row1) end
-  return as,bs,a,b,C,minkowski(data1,a,bs[1])  end
+  return as,bs,a,b,C,self:dist(a,bs[1])  end
 --------- --------- --------- --------- --------- --------- ----
 return { ROW=ROW, DATA=DATA, SYM=SYM, NUM=NUM,
-         col=col, mid=mid, div=div, norm=norm, stats=stats,
-         d2h=d2h, minkowski=minkowski,aha=aha,
-         neighbors=neighbors,half=half,
-         clone=clone, the=the, help=help}
+         the=the, help=help}

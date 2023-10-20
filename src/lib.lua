@@ -6,6 +6,15 @@ function l.rogues()
   for k,v in pairs(_ENV) do 
     if not b4[k] then print("#W ?",k,type(v)) end end end
 --------- --------- --------- --------- --------- --------- -----
+local id=0
+function l.obj(s,    t)
+  t = {_name=s}
+  t.__index = t
+  return setmetatable(t, { __call=function(_,...)
+    id = id + 1
+    local i = setmetatable({_id=id},t)
+    return setmetatable(t.new(i,...) or i,t) end}) end
+--------- --------- --------- --------- --------- --------- -----
 l.fmt = string.format
 
 function l.o(t,d,          u,x,mult)
@@ -16,10 +25,10 @@ function l.o(t,d,          u,x,mult)
       return math.floor(t * mult + 0.5) / mult end
   end
   if type(t) ~= "table" then return tostring(t) end
-  u={}; for k,v in pairs(t) do
+  u={}; for k,v in l.items(t) do
           x= l.o(v,d)
           u[1+#u]= #t==0 and l.fmt(":%s %s",k,x) or x end
-  return "{"..table.concat(#t==0 and l.sort(u) or u," ").."}" end
+  return (t._name or "").."{"..table.concat(u," ").."}" end
 
 function l.oo(t,d) print(l.o(t,d)); return t end
 --------- --------- --------- --------- --------- --------- -----
