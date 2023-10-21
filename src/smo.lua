@@ -40,7 +40,9 @@ local function d2h(data,t)
 local function train(data,rows,       t)
   t={}; for i=1,10 do t[1+#t] = rows[i] end
   table.sort(t, function (r1,r2) return d2h(data,r1) < d2h(data,r2) end)
-  for _,x in pairs(t) do print(d2h(data,x), l.o(x)) end end
+  mid = math.floor(#t/2)
+  for i=1,mid    do count(data,1,t[i]) end
+  for i=mid+1,#t do count(data,0,t[i]) end  end 
 
 local function main(      data)
   for t in l.csv(the.file) do
