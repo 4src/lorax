@@ -20,8 +20,8 @@ OPTIONS:
   -s --seed   random number seed       = 937162211]]
 
 local o,oo,push  = l.o,l.oo,l.push
-local SYM,NUM,DATA=l.obj"SYM",l.obj"NUM",l.obj"DATA"
-local ROW, COLS= l.obj"ROW",l.obj"COLS"
+local SYM,NUM,DATA=l.obj"SYM", l.obj"NUM",  l.obj"DATA"
+local ROW, COLS= l.obj"ROW", l.obj"COLS"
 --------- --------- --------- --------- --------- --------- -----
 local function COL(n,s)
   return ((s or ""):find"^[A-Z]" and NUM or SYM)(n,s) end

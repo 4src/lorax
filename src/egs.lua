@@ -5,28 +5,28 @@ local ROW,SYM,DATA,NUM=lorax.ROW,lorax.SYM,lorax.DATA,lorax.NUM
 local the = lorax.the
 local eg={}
 --------- --------- --------- --------- --------- --------- -----
-local function trip(s,fun,     oops)
+local function fails(s,fun)
   l.rseed = the.seed
   print("==> ".. s)
-  oops = fun()==false 
-  if oops then print("❌ FAIL : "..  s) end 
-  return oops end
+  if fun()==false then 
+    print("❌ FAIL : ".. s); return true end end
 
 local function run(help)
   l.cli(the)
   if the.help then print(help) else
     for _,com in pairs(arg) do
-      if eg[com] then trip(com,eg[com]) end end end
+      if eg[com] then fails(com,eg[com]) end end end
   l.rogues() end
 --------- --------- --------- --------- --------- --------- -----
 function eg.fails() return false end
 
-function eg.all(     bad)
-  bad = 0
+function eg.all(     oops)
+  oops = -1 -- we have one test that deliberately fails
   for k,fun in l.items(eg) do
-    if k~="all" then if trip(k,fun) then bad = bad+1 end end end
+    if k~="all" then 
+      if fails(k,fun) then oops = oops + 1 end end end
   l.rogues()
-  os.exit(bad) end
+  os.exit(oops) end
 
 function eg.csv(      n)
   n=0; for t in l.csv(the.file) do n = n + #t end 
