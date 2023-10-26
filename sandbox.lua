@@ -1,10 +1,10 @@
 fmt=string.format
-
-function cat(t,     u,f,g)
+function oo(t) print(o(t)) return t end
+function o(t,     u,f,g)
   if type(t) ~= "table" then return fmt("%s",t) end
   u={}
-  function f() for _,v in pairs(t) do u[1+#u]=fmt("%s",v) end end
-  function g() for k,v in pairs(t) do u[1+#u]=fmt(":%s %s",k,v) end
+  function f() for _,v in pairs(t) do u[1+#u]=fmt("%s",o(v)) end end
+  function g() for k,v in pairs(t) do u[1+#u]=fmt(":%s %s",k,o(v)) end
                table.sort(u) end
   (#t>0 and f or g)()
   return "{"..table.concat(u," ").."}" end
@@ -13,7 +13,7 @@ function obj(s,    t)
   t = {}
   return setmetatable(t, { __call=function(klass,...)
     klass.__index    = klass
-    klass.__tostring = cat
+    klass.__tostring = o
     local i = setmetatable({ako=s},t)
     return setmetatable(t.init(i,...) or i,t) end}) end
 
@@ -28,5 +28,6 @@ g=Emp(10)
 print"---"
 g.m = e
 
-print(g)
+oo({g,10,{g}})
+
 print(e.ako)
