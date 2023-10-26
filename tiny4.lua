@@ -25,8 +25,6 @@ function add(col,x,     _sym,_num)
     col.n = col.n + 1; (col.symp and _sym or _num)() end
   return col end
 
-
-
 function mid(col) return col.symp and col.mode     or col.mu end
 function div(col) return col.symp and ent(col.has) or sd(col) end
 
@@ -34,7 +32,7 @@ function sd(num)
   num.sd = num.sd or (num.m2/(num.n - 1))^.5
   return num.sd end
 
-function ent(t,     e,N)
+function ent(t,     e,N)  
   e,N = 0,0
   for _,n in pairs(t) do N = N + n end
   for _,n in pairs(t) do e = e - n/N*math.log(n/N,2) end
@@ -78,7 +76,7 @@ function classify(datas,row)
     if tmp > most then out,most=k,tmp end
   return out,most end
   -----------------------------------
-  function d2h(cols,t) 
+function d2h(cols,t) 
   for _,col in pairs(cols.y) do
     n = n + 0
     d = d + (col.heaven - norm(col, t[col.at]))^2 end
