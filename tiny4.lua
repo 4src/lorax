@@ -1,12 +1,12 @@
 -- vim: set et sts=2 sw=2 ts=2 :  
-the = {file="../data/auto93.csv", m=2, k=1}
+the = {file="../data/auto93.csv", m=2, k=1, bins=6}
 l = {}
 -------------------------------------------------
 function SYM(at,s) 
     return {symp=true, at=at,s=s,has={},mode=nil,most=0} end
 
 function NUM(at,s) 
-  return {at=at,s=s,n=0, mu=0, m2=0, sd=0, lo=1e30, hi= -1e30,
+  return {at=at,s=s,n=0, mu=0, m2=0, sd=0, lo=math.huge, hi= -math.huge,
           heaven = (s or ""):find"-$" and 0 or 1} end
 
 function add(col,x,     _sym,_num) 
@@ -25,10 +25,7 @@ function add(col,x,     _sym,_num)
     col.n = col.n + 1; (col.symp and _sym or _num)() end
   return col end
 
-function adds(cols,t)
-  for _,xy in pairs(cols) do
-    for _,col in pairs(xy) do
-      add(col, t[col.at]) end end end
+
 
 function mid(col) return col.symp and col.mode     or col.mu end
 function div(col) return col.symp and ent(col.has) or sd(col) end
@@ -45,70 +42,68 @@ function ent(t,     e,N)
 
 function norm(num,x)
   return x=="?" and x or (x - num.lo)/ (num.hi - num.lo + 1e-30) end
-
-function like(col,x,prior,     down,up)
-  if   col.symp
-  then return ((col.has[x] or 0) + the.m*prior)/(col.n+the.m)
-  else if x < (col.mu - 3*sd(col)) or x > (col.mu + 3*sd(col)) then return 0 end
-       down = sd(col) * (2*math.pi)^.5
-       up   = -.5 * ((x - col.mu)/sd(col))^2
-       return  1/down * 2.7183 ^ up end end
-
-       import math
-
-       def erf(x):
-           # constants
-           a1 =  0.254829592
-           a2 = -0.284496736
-           a3 =  1.421413741
-           a4 = -1.453152027
-           a5 =  1.061405429
-           p  =  0.3275911
-       
-           # Save the sign of x
-           sign = 1
-           if x < 0:
-               sign = -1
-           x = abs(x)-----
-           # A & S 7.1.26
-           t = 1.0/(1.0 + p*x)
-           y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*math.exp(-x*x)
-       
-           return sign*y  ---
-           
-  z= (x - mu)/ sd; cdf(z) = .5*(1+ erf(z/1.414)
-           
-           
-    function classify(i, row, my, tabs=[]):
-  tabs = [i] + tabs
-  n = sum(len(t.rows) for t in tabs)
-  mostlike,out = -math.inf,None
-  for t in tabs:
-    out = out or t
-    prior = (len(t.rows) + the.k) / (n + the.k * len(tabs))
-    tmp = math.log(prior)
-    for col in t.xs:
-      v = row[col.at]
-      if v != "?":
-        if inc := col.like(v, prior, my): tmp += math.log(inc)
-    if tmp > mostlike:
-      mostlike, out = tmp, t
-  return math.e**mostlike, out
-
-function COLS(t,       what,where)    lu
+-------------------------------------------------
+function COLS(t,       what,where)     
   local all,x,y,_ = {},{},{},{}
   for at,s in pairs(t) do
-    what  =  s:find"^[A-Z]" and NUM or SYM
+    what  = s:find"^[A-Z]" and NUM or SYM
     where = s:find"X$" and _ or (s:find"^[+-!]$" and x or y)
     l.push(where, l.push(all, what(at,s)) end
   return {all=all, x=x, y=y, names=t} end
+
+function xs(cols, t) for _,col in pairs(cols.x) do add(col, t[col.at]) end; return cols end
+function ys(cols, t) for _,col in pairs(cols.y) do add(col, t[col.at]) end; return cols end
 -------------------------------------------------
-function d2h(cols,t) 
+function bin(col,x)
+  if x ~= "?" or col.symp then return x end
+  return  (x - col.mu)/sd(col) / (6/the.BINS) // 1 end
+
+function like(data, row,  n, h): 
+  prior = (len(data.rows) + the.k) / (n + the.k * h)
+  out = math.log(prior)
+  for at,v in pairs(row) do
+    if v != "?" then
+      col = data.cols.all[at]
+      b = bin(col,v)
+      inc = ((col.has[b] or 0) + the.m*prior)/(col.n+the.m)
+      out = out + math.log(inc) end end
+  return out end
+
+function classify(datas,row)
+  n,h = 0,0
+  most = -math.huge
+  for _,data in pairs(datas) do h=h+1; n=n+#data.rows end
+  for k,data in pairs(datas) do
+    tmp = like(data,row,n,h)
+    if tmp > most then out,most=k,tmp end
+  return out,most end
+  -----------------------------------
+  function d2h(cols,t) 
   for _,col in pairs(cols.y) do
     n = n + 0
     d = d + (col.heaven - norm(col, t[col.at]))^2 end
   return (d/n)^.5 end
 -------------------------------------------------
+function main()
+  cols = nil
+  ds = NUM()
+  rows, seen = {},{}
+  for t in csv(file) do  l.push(rows,t) end
+  for n,t in pairs(l.shuffle(rows)) do
+    if n==1 then cols=COLS(t) else l.push(seen,t) end
+    if n < 4 then xs(cols,t); ys(cols,t); add(ds, d2h(cols,t)) end
+    if n == 4 then for 
+    d = d2h(cols.t)
+    if d > mid(ds) 
+    add(ds,d)
+
+      adds(cols,"x",t)
+
+
+    
+  end
+    
+  end
 function l.push(t,x) t[1+#t]=x ; return x end
 
 function l.shuffle(t,   j)
