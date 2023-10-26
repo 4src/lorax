@@ -1,7 +1,7 @@
 fmt=string.format
 
 function cat(t,     u,f,g)
-  if type(t) ~= "table" then print(tostring(t)) end
+  if type(t) ~= "table" then return fmt("%s",t) end
   u={}
   function f() for _,v in pairs(t) do u[1+#u]=fmt("%s",v) end end
   function g() for k,v in pairs(t) do u[1+#u]=fmt(":%s %s",k,v) end
