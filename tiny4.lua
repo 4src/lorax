@@ -48,7 +48,6 @@ function COLS(t,       what,where)
     where = s:find"X$" and _ or (s:find"^[+-!]$" and x or y)
     l.push(where, l.push(all, what(at,s)) end
   return {all=all, x=x, y=y, names=t} end
-
 function xs(cols, t) adds(cols.x, t) end
 function ys(cols, t) adds(cols.y, t) end
 function adds(xycols, t)
