@@ -49,8 +49,10 @@ function COLS(t,       what,where)
     l.push(where, l.push(all, what(at,s)) end
   return {all=all, x=x, y=y, names=t} end
 
-function xs(cols, t) for _,col in pairs(cols.x) do add(col, t[col.at]) end; return cols end
-function ys(cols, t) for _,col in pairs(cols.y) do add(col, t[col.at]) end; return cols end
+function xs(cols, t) adds(cols.x, t) end
+function ys(cols, t) adds(cols.y, t) end
+function adds(xycols, t)
+  for _,col in pairs(xycols) do add(col, t[col.at]) end end
 -------------------------------------------------
 function bin(col,x)
   if x ~= "?" or col.symp then return x end
