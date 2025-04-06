@@ -21,7 +21,7 @@ function add(col,x,     _sym,_num)
     i.sd = nil
     if x > i.hi then i.hi = x end
     if x < i.lo then i.lo = x end end
-  if x~="?" then
+  if x ~= nil and x~="?" then
     col.n = col.n + 1; (col.symp and _sym or _num)() end
   return col end
 
@@ -39,7 +39,7 @@ function ent(t,     e,N)
   return e end
 
 function norm(num,x)
-  return x=="?" and x or (x - num.lo)/ (num.hi - num.lo + 1e-30) end
+  return (x - num.lo)/ (num.hi - num.lo + 1e-30) end
 -------------------------------------------------
 function COLS(t,       what,where)     
   local all,x,y,_ = {},{},{},{}
@@ -48,13 +48,13 @@ function COLS(t,       what,where)
     where = s:find"X$" and _ or (s:find"^[+-!]$" and x or y)
     l.push(where, l.push(all, what(at,s)) end
   return {all=all, x=x, y=y, names=t} end
+
 function xs(cols, t) adds(cols.x, t) end
 function ys(cols, t) adds(cols.y, t) end
 function adds(xycols, t)
   for _,col in pairs(xycols) do add(col, t[col.at]) end end
 -------------------------------------------------
 function bin(col,x)
-  if x ~= "?" or col.symp then return x end
   return  (x - col.mu)/sd(col) / (6/the.BINS) // 1 end
 
 function like(data, row,  n, h): 
@@ -63,7 +63,7 @@ function like(data, row,  n, h):
   for at,v in pairs(row) do
     if v != "?" then
       col = data.cols.all[at]
-      b = bin(col,v)
+      b   = col.symp and v or bin(col,v)
       inc = ((col.has[b] or 0) + the.m*prior)/(col.n+the.m)
       out = out + math.log(inc) end end
   return out end
